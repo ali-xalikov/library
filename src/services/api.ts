@@ -1,4 +1,4 @@
-const BASE_URL: string = import.meta.env.VITE_MOKKY_BASE_URL ?? '';
+const BASE_URL: string = import.meta.env.VITE_MOKKY_BASE_URL || 'https://1a40451337cdbc1f.mokky.dev';
 
 const TOKEN_KEY = 'mokky_token';
 
