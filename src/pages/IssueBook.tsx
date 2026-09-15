@@ -143,24 +143,28 @@ export default function IssueBook() {
   return (
     <div className="space-y-6">
       <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('issueBook.title')}</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          {t("issueBook.title")}
+        </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {t('issueBook.subtitle')}
+          {t("issueBook.subtitle")}
         </p>
       </div>
 
       <div className="flex animate-fade-in items-center gap-2 sm:gap-3">
         {[
-          { num: 1, label: t('issueBook.step1') },
-          { num: 2, label: t('issueBook.step2') },
-          { num: 3, label: t('issueBook.step3') },
+          { num: 1, label: t("issueBook.step1") },
+          { num: 2, label: t("issueBook.step2") },
+          { num: 3, label: t("issueBook.step3") },
         ].map((s, index) => (
           <Fragment key={s.num}>
             <div className="flex items-center gap-2">
               <span
-                className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ring-4 transition-all duration-200 ${stepCircleClass(s.num)}`}
+                className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ring-4 transition-all duration-200 ${stepCircleClass(
+                  s.num
+                )}`}
               >
-                {stepStatus(s.num) === 'completed' ? (
+                {stepStatus(s.num) === "completed" ? (
                   <Check className="h-4 w-4" />
                 ) : (
                   s.num
@@ -168,9 +172,9 @@ export default function IssueBook() {
               </span>
               <span
                 className={`text-sm font-medium ${
-                  stepStatus(s.num) === 'pending'
-                    ? 'text-slate-400 dark:text-slate-500'
-                    : 'text-slate-900 dark:text-white'
+                  stepStatus(s.num) === "pending"
+                    ? "text-slate-400 dark:text-slate-500"
+                    : "text-slate-900 dark:text-white"
                 }`}
               >
                 {s.label}
@@ -180,8 +184,8 @@ export default function IssueBook() {
               <div
                 className={`h-px flex-1 ${
                   step > s.num
-                    ? 'bg-primary-400 dark:bg-primary-500'
-                    : 'bg-slate-200 dark:bg-slate-700'
+                    ? "bg-primary-400 dark:bg-primary-500"
+                    : "bg-slate-200 dark:bg-slate-700"
                 }`}
               />
             )}
@@ -210,10 +214,10 @@ export default function IssueBook() {
           </span>
           <div>
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              {t('issueBook.findStudent')}
+              {t("issueBook.findStudent")}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {t('issueBook.findStudentHint')}
+              {t("issueBook.findStudentHint")}
             </p>
           </div>
           <BookUser className="ml-auto h-5 w-5 text-slate-300 dark:text-slate-600" />
@@ -222,20 +226,20 @@ export default function IssueBook() {
         <SearchInput
           value={studentSearch}
           onChange={(e) => setStudentSearch(e.target.value)}
-          placeholder={t('issueBook.findStudentHint')}
+          placeholder={t("issueBook.findStudentHint")}
         />
 
         <div className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-1">
           {filteredStudents.length === 0 ? (
             <EmptyState
               icon={UserRound}
-              title={t('issueBook.studentNotFound')}
-              description={t('issueBook.studentNotFoundDesc')}
+              title={t("issueBook.studentNotFound")}
+              description={t("issueBook.studentNotFoundDesc")}
             />
           ) : (
             filteredStudents.map((student) => {
               const count = borrows.filter(
-                (b) => b.studentId === student.id && b.status === 'active'
+                (b) => b.studentId === student.id && b.status === "active"
               ).length;
               const isSelected = selectedStudent?.id === student.id;
               return (
@@ -245,8 +249,8 @@ export default function IssueBook() {
                   onClick={() => handleSelectStudent(student)}
                   className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
                     isSelected
-                      ? 'border-primary-400 bg-primary-50 ring-2 ring-primary-500/20 dark:border-primary-500 dark:bg-primary-900/20'
-                      : 'border-slate-200 bg-white hover:border-primary-300 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary-500'
+                      ? "border-primary-400 bg-primary-50 ring-2 ring-primary-500/20 dark:border-primary-500 dark:bg-primary-900/20"
+                      : "border-slate-200 bg-white hover:border-primary-300 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary-500"
                   }`}
                 >
                   {student.avatar ? (
@@ -265,18 +269,25 @@ export default function IssueBook() {
                       {student.firstName} {student.lastName}
                     </p>
                     <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
-                      {student.email} · {student.qrCode ?? '—'}
+                      {student.email} · {student.qrCode ?? "—"}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     <Badge variant="info" size="sm">
                       <GraduationCap className="mr-1 h-3 w-3" />
-                      {student.grade ? `${student.grade}-sinf` : 'Sinf noma\'lum'}
+                      {student.grade
+                        ? `${student.grade}-sinf`
+                        : "Sinf noma'lum"}
                     </Badge>
-                    <Badge variant={count > 0 ? 'warning' : 'default'} size="sm">
+                    <Badge
+                      variant={count > 0 ? "warning" : "default"}
+                      size="sm"
+                    >
                       {count} ta aktiv
                     </Badge>
-                    {isSelected && <Check className="h-4 w-4 text-primary-600 dark:text-primary-400" />}
+                    {isSelected && (
+                      <Check className="h-4 w-4 text-primary-600 dark:text-primary-400" />
+                    )}
                   </div>
                 </button>
               );
@@ -288,10 +299,12 @@ export default function IssueBook() {
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-900/20">
             <div className="min-w-0">
               <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-300">
-                {t('issueBook.selected')} {selectedStudent.firstName} {selectedStudent.lastName}
+                {t("issueBook.selected")} {selectedStudent.firstName}{" "}
+                {selectedStudent.lastName}
               </p>
               <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                {selectedStudent.grade}-sinf · Hozir {selectedBorrowCount}{t('issueBook.activeLoans')}
+                {selectedStudent.grade}-sinf · Hozir {selectedBorrowCount}
+                {t("issueBook.activeLoans")}
                 {settings.maxBooksPerStudent > 0 &&
                   ` / ${settings.maxBooksPerStudent} ta limit`}
               </p>
@@ -300,7 +313,7 @@ export default function IssueBook() {
               onClick={() => setStep(2)}
               disabled={selectedBorrowCount >= settings.maxBooksPerStudent}
             >
-              {t('issueBook.next')}
+              {t("issueBook.next")}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
@@ -315,10 +328,10 @@ export default function IssueBook() {
             </span>
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                {t('issueBook.selectBook')}
+                {t("issueBook.selectBook")}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t('issueBook.selectBookHint')}
+                {t("issueBook.selectBookHint")}
               </p>
             </div>
             <BookMarked className="ml-auto h-5 w-5 text-slate-300 dark:text-slate-600" />
@@ -327,68 +340,66 @@ export default function IssueBook() {
           <SearchInput
             value={bookSearch}
             onChange={(e) => setBookSearch(e.target.value)}
-            placeholder={t('issueBook.selectBookHint')}
+            placeholder={t("issueBook.selectBookHint")}
           />
 
           <div className="mt-4 max-h-96 space-y-2 overflow-y-auto pr-1">
-            {filteredBooks.length === 0 ? (
-              <EmptyState
-                icon={BookOpen}
-              title={t('issueBook.bookNotFound')}
-              description={t('issueBook.bookNotFoundDesc')}
-              />
-            ) : (
-              filteredBooks.map((book) => {
-                const isSelected = selectedBook?.id === book.id;
-                return (
-                  <button
-                    key={book.id}
-                    type="button"
-                    onClick={() => handleSelectBook(book)}
-                    className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-200 ${
-                      isSelected
-                        ? 'border-primary-400 bg-primary-50 ring-2 ring-primary-500/20 dark:border-primary-500 dark:bg-primary-900/20'
-                        : 'border-slate-200 bg-white hover:border-primary-300 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary-500'
-                    }`}
-                  >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300">
-                      <BookOpen className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
-                        {book.title}
-                      </p>
-                      <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
-                        {book.author} · {book.inventoryNumber}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
+            {filteredBooks.map((book) => {
+              const isSelected = selectedBook?.id === book.id;
+              return (
+                <button
+                  key={book.id}
+                  type="button"
+                  onClick={() => handleSelectBook(book)}
+                  className={`flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition-all duration-200 sm:items-center sm:px-4 ${
+                    isSelected
+                      ? "border-primary-400 bg-primary-50 ring-2 ring-primary-500/20 dark:border-primary-500 dark:bg-primary-900/20"
+                      : "border-slate-200 bg-white hover:border-primary-300 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary-500"
+                  }`}
+                >
+                  {/* Icon */}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+                    <BookOpen className="h-5 w-5" />
+                  </span>
+
+                  {/* Title + author + badges */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-900 dark:text-white leading-snug">
+                      {book.title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      {book.author}
+                    </p>
+
+                    {/* Badges - mobil da pastga tushadi */}
+                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
                       <Badge variant="success" size="sm">
                         <Layers className="mr-1 h-3 w-3" />
-                        {book.availableCopies}{t('issueBook.copiesAvailable')}
+                        {book.availableCopies}
+                        {t("issueBook.copiesAvailable")}
                       </Badge>
                       <Badge variant="default" size="sm">
                         <Landmark className="mr-1 h-3 w-3" />
-                        {book.shelfNumber}
+                        {book.inventoryNumber || book.shelfNumber}
                       </Badge>
                       {isSelected && (
                         <Check className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                       )}
                     </div>
-                  </button>
-                );
-              })
-            )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(1)}>
               <ArrowLeft className="h-4 w-4" />
-              {t('issueBook.back')}
+              {t("issueBook.back")}
             </Button>
             {selectedBook && (
               <Button onClick={() => setStep(3)}>
-                {t('issueBook.next')}
+                {t("issueBook.next")}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             )}
@@ -404,10 +415,10 @@ export default function IssueBook() {
             </span>
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                {t('issueBook.confirmLoan')}
+                {t("issueBook.confirmLoan")}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {t('issueBook.confirmLoanHint')}
+                {t("issueBook.confirmLoanHint")}
               </p>
             </div>
           </div>
@@ -416,7 +427,7 @@ export default function IssueBook() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
               <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <UserRound className="h-4 w-4" />
-                {t('issueBook.step1')}
+                {t("issueBook.step1")}
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {selectedStudent.firstName} {selectedStudent.lastName}
@@ -425,14 +436,15 @@ export default function IssueBook() {
                 {selectedStudent.grade}-sinf · {selectedStudent.email}
               </p>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Aktiv qarzlar: {selectedBorrowCount} / {settings.maxBooksPerStudent}
+                Aktiv qarzlar: {selectedBorrowCount} /{" "}
+                {settings.maxBooksPerStudent}
               </p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
               <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <BookOpen className="h-4 w-4" />
-                {t('issueBook.step2')}
+                {t("issueBook.step2")}
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {selectedBook.title}
@@ -452,7 +464,9 @@ export default function IssueBook() {
                 <Search className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t('issueBook.issueDate')}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {t("issueBook.issueDate")}
+                </p>
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">
                   {formatDate(issuedDate.toISOString())}
                 </p>
@@ -463,7 +477,9 @@ export default function IssueBook() {
                 <Landmark className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{t('issueBook.dueDate')}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {t("issueBook.dueDate")}
+                </p>
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">
                   {formatDate(dueDate)} ({settings.maxBorrowDays} kun)
                 </p>
@@ -474,11 +490,11 @@ export default function IssueBook() {
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(2)}>
               <ArrowLeft className="h-4 w-4" />
-              {t('issueBook.back')}
+              {t("issueBook.back")}
             </Button>
             <Button size="lg" onClick={handleConfirm} loading={loading}>
               <Check className="h-4 w-4" />
-              {t('issueBook.confirm')}
+              {t("issueBook.confirm")}
             </Button>
           </div>
         </Card>
