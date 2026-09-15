@@ -24,16 +24,25 @@ const inputClass =
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300';
 
-const roleBadge: Record<Role, { variant: 'danger' | 'info' | 'success' }> = {
-  admin: { variant: 'danger' },
-  librarian: { variant: 'info' },
-  student: { variant: 'success' },
+const roleBadge = {
+  admin: {
+    label: "Admin",
+    variant: "danger" as const,
+  },
+  librarian: {
+    label: "Kutubxonachi",
+    variant: "info" as const,
+  },
+  student: {
+    label: "O‘quvchi",
+    variant: "success" as const,
+  },
 };
 
 const roleOptions = [
-  { value: 'admin' },
-  { value: 'librarian' },
-  { value: 'student' },
+  { value: "admin", label: "Admin" },
+  { value: "librarian", label: "Kutubxonachi" },
+  { value: "student", label: "O‘quvchi" },
 ];
 
 type TabKey = 'all' | Role;
