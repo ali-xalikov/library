@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import type { DashboardStats } from '../types';
@@ -42,10 +43,10 @@ import {
 } from '../utils/helpers';
 import { getBorrowStatusColor, getBorrowStatusLabel } from '../utils/status';
 
-const roleLabels: Record<string, string> = {
-  admin: 'Administrator',
-  librarian: 'Kutubxonachi',
-  student: "O'quvchi",
+const roleKeys: Record<string, string> = {
+  admin: 'admin',
+  librarian: 'librarian',
+  student: 'student',
 };
 
 const CHART_COLORS = [
@@ -61,53 +62,45 @@ const CHART_COLORS = [
   '#0ea5e9',
 ];
 
-interface StatCardConfig {
-  key: keyof DashboardStats;
-  label: string;
-  icon: LucideIcon;
-  iconClass: string;
-  tint: string;
-}
-
-const statCards: StatCardConfig[] = [
+const statCardKeys: { key: keyof DashboardStats; i18nKey: string; icon: LucideIcon; iconClass: string; tint: string }[] = [
   {
     key: 'totalBooks',
-    label: 'Jami kitoblar',
+    i18nKey: 'dashboard.totalBooks',
     icon: BookOpen,
     iconClass: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
     tint: 'bg-blue-50/60 dark:bg-blue-900/10',
   },
   {
     key: 'availableBooks',
-    label: 'Mavjud kitoblar',
+    i18nKey: 'dashboard.availableBooks',
     icon: Package,
     iconClass: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
     tint: 'bg-emerald-50/60 dark:bg-emerald-900/10',
   },
   {
     key: 'borrowedBooks',
-    label: 'Berilgan kitoblar',
+    i18nKey: 'dashboard.borrowedBooks',
     icon: Handshake,
     iconClass: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
     tint: 'bg-amber-50/60 dark:bg-amber-900/10',
   },
   {
     key: 'overdueBooks',
-    label: 'Kechikkan kitoblar',
+    i18nKey: 'dashboard.overdueBooks',
     icon: AlertTriangle,
     iconClass: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     tint: 'bg-red-50/60 dark:bg-red-900/10',
   },
   {
     key: 'totalStudents',
-    label: "Jami o'quvchilar",
+    i18nKey: 'dashboard.totalStudents',
     icon: Users,
     iconClass: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
     tint: 'bg-purple-50/60 dark:bg-purple-900/10',
   },
   {
     key: 'dueToday',
-    label: 'Buguni qaytarish kerak',
+    i18nKey: 'dashboard.dueToday',
     icon: Clock,
     iconClass: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
     tint: 'bg-orange-50/60 dark:bg-orange-900/10',
@@ -149,6 +142,7 @@ function ChartSection({
 export default function Dashboard() {
   const { user } = useAuth();
   const { books, users, borrows } = useApp();
+  const { t } = useTranslation();
 
   const stats = getDashboardStats(books, borrows, users);
   const monthlyData = getMonthlyStats(borrows);
@@ -162,17 +156,17 @@ export default function Dashboard() {
 
   const firstName = user?.firstName ?? 'Foydalanuvchi';
   const lastName = user?.lastName ?? '';
-  const roleLabel = user ? (roleLabels[user.role] ?? user.role) : '';
+  const roleLabel = user ? t('role.' + (roleKeys[user.role] ?? user.role)) : '';
 
   return (
     <div className="space-y-6">
       <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Xush kelibsiz, {firstName} {lastName}!
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          {t('dashboard.welcome')} {firstName} {lastName}!
         </h1>
         <div className="mt-1 flex items-center gap-2">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Bugungi kutubxona faoliyati haqidagi umumiy ma'lumot
+            {t('dashboard.subtitle')}
           </p>
           {roleLabel && (
             <span className="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
@@ -183,7 +177,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-        {statCards.map((card) => {
+        {statCardKeys.map((card) => {
           const Icon = card.icon;
           const value = stats[card.key];
           return (
@@ -197,7 +191,7 @@ export default function Dashboard() {
                     {value}
                   </p>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    {card.label}
+                    {t(card.i18nKey)}
                   </p>
                 </div>
                 <span className={`h-12 w-12 shrink-0 rounded-xl flex items-center justify-center ${card.iconClass}`}>
@@ -210,7 +204,7 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <ChartSection title="Oylar bo'yicha kitob berilishi" icon={TrendingUp}>
+        <ChartSection title={t('dashboard.monthlyActivity')} icon={TrendingUp}>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={monthlyData} barGap={4}>
               <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" strokeOpacity={0.5} />
@@ -225,18 +219,18 @@ export default function Dashboard() {
                 }}
               />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar dataKey="issued" name="Berilgan" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="returned" name="Qaytarilgan" fill="#10b981" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="issued" name={t('dashboard.issued')} fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="returned" name={t('dashboard.returned')} fill="#10b981" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartSection>
 
-        <ChartSection title="Eng ko'p o'qilayotgan kitoblar" icon={TrendingDown}>
+        <ChartSection title={t('dashboard.topBooks')} icon={TrendingDown}>
           {topBooks.length === 0 ? (
             <EmptyState
               icon={BookOpen}
-              title="Kitoblar topilmadi"
-              description="Hozircha hech qanday qarz berish qayd etilmagan."
+              title={t('dashboard.noBooks')}
+              description={t('dashboard.noActivityDesc')}
             />
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -257,18 +251,18 @@ export default function Dashboard() {
                     fontSize: 12,
                   }}
                 />
-                <Bar dataKey="count" name="Berilgan" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="count" name={t('dashboard.issued')} fill="#8b5cf6" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </ChartSection>
 
-        <ChartSection title="Fanlar bo'yicha kitoblar" icon={PieChartIcon}>
+        <ChartSection title={t('dashboard.subjectBooks')} icon={PieChartIcon}>
           {subjectData.length === 0 ? (
             <EmptyState
               icon={BookOpen}
-              title="Kitoblar topilmadi"
-              description="Hozircha kutubxona fondida kitoblar mavjud emas."
+              title={t('dashboard.noBooks')}
+              description={t('dashboard.noBooksDesc')}
             />
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -299,12 +293,12 @@ export default function Dashboard() {
           )}
         </ChartSection>
 
-        <ChartSection title="Sinflar bo'yicha statistika" icon={GraduationCap}>
+        <ChartSection title={t('dashboard.gradeStats')} icon={GraduationCap}>
           {gradeData.length === 0 ? (
             <EmptyState
               icon={GraduationCap}
-              title="Ma'lumot topilmadi"
-              description="Hozircha qarz berish bo'yicha statistika mavjud emas."
+              title={t('dashboard.noData')}
+              description={t('dashboard.noDataDesc')}
             />
           ) : (
             <ResponsiveContainer width="100%" height={280}>
@@ -320,7 +314,7 @@ export default function Dashboard() {
                     fontSize: 12,
                   }}
                 />
-                <Bar dataKey="count" name="Berilgan" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="count" name={t('dashboard.issued')} fill="#f59e0b" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -333,22 +327,28 @@ export default function Dashboard() {
             <Activity className="h-4 w-4" />
           </span>
           <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-            So'nggi faoliyat
+            {t('dashboard.recentActivity')}
           </h3>
         </div>
 
         {recentBorrows.length === 0 ? (
           <EmptyState
             icon={Activity}
-            title="Faoliyat yo'q"
-            description="Hozircha hech qanday qarz berish qayd etilmagan."
+            title={t('dashboard.noActivity')}
+            description={t('dashboard.noActivityDesc')}
           />
         ) : (
           <div className="w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
-                  {['O\'quvchi', 'Kitob', 'Berildi', 'Qaytarish muddati', 'Holat'].map((col) => (
+                  {[
+                    t('dashboard.student'),
+                    t('dashboard.book'),
+                    t('dashboard.issueDate'),
+                    t('dashboard.dueDate'),
+                    t('dashboard.status'),
+                  ].map((col) => (
                     <th
                       key={col}
                       className="px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap"

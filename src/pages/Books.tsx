@@ -11,8 +11,9 @@ import StatusBadge from '../components/ui/StatusBadge';
 import StarRating from '../components/ui/StarRating';
 import BookCover from '../components/ui/BookCover';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import type { Grade, Subject } from '../types';
-import { filterBooks, getBookStatusLabel, getSubjectIcon } from '../utils/helpers';
+import { filterBooks, getSubjectIcon } from '../utils/helpers';
 
 const subjects: Subject[] = [
   'Matematika',
@@ -37,10 +38,6 @@ const statuses = ['available', 'borrowed', 'reserved', 'maintenance', 'lost'] as
 const subjectOptions = subjects.map((s) => ({ value: s, label: s }));
 const gradeOptions = grades.map((g) => ({ value: String(g), label: `${g}-sinf` }));
 const languageOptions = languages.map((l) => ({ value: l, label: l }));
-const statusOptions = statuses.map((s) => ({
-  value: s,
-  label: getBookStatusLabel(s),
-}));
 
 type ViewMode = 'grid' | 'table';
 
@@ -48,6 +45,7 @@ const GRID_PER_PAGE = 12;
 const TABLE_PER_PAGE = 15;
 
 export default function Books() {
+  const { t } = useTranslation();
   const { books, ratings } = useApp();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -66,6 +64,11 @@ export default function Books() {
   const [language, setLanguage] = useState('');
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
+
+  const statusOptions = statuses.map((s) => ({
+    value: s,
+    label: t(`status.${s}`),
+  }));
 
   const category = searchParams.get('category') ?? '';
 
@@ -116,9 +119,9 @@ export default function Books() {
     <div className="animate-fade-in space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Kitoblar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('books.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Kutubxona fondidagi barcha kitoblar
+            {t('books.subtitle')}
           </p>
         </div>
         <Link
@@ -126,7 +129,7 @@ export default function Books() {
           className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
         >
           <Plus className="h-4 w-4" />
-          Yangi kitob
+          {t('books.new')}
         </Link>
       </div>
 
@@ -136,31 +139,31 @@ export default function Books() {
             className="col-span-2"
             value={search}
             onChange={(e) => handleFilterChange(setSearch)(e.target.value)}
-            placeholder="Nomi, muallif, ISBN yoki inventar..."
+            placeholder={t('books.search')}
           />
           <Select
             value={subject}
             onChange={(e) => handleFilterChange(setSubject)(e.target.value)}
             options={subjectOptions}
-            placeholder="Fan"
+            placeholder={t('books.subject')}
           />
           <Select
             value={grade}
             onChange={(e) => handleFilterChange(setGrade)(e.target.value)}
             options={gradeOptions}
-            placeholder="Sinf"
+            placeholder={t('books.grade')}
           />
           <Select
             value={language}
             onChange={(e) => handleFilterChange(setLanguage)(e.target.value)}
             options={languageOptions}
-            placeholder="Til"
+            placeholder={t('books.language')}
           />
           <Select
             value={status}
             onChange={(e) => handleFilterChange(setStatus)(e.target.value)}
             options={statusOptions}
-            placeholder="Holat"
+            placeholder={t('books.status')}
           />
         </div>
       </Card>
@@ -178,14 +181,14 @@ export default function Books() {
                   setPage(1);
                 }}
                 className="ml-0.5 rounded-full p-0.5 hover:bg-primary-100 dark:hover:bg-primary-800"
-                title="Kategoriyani olib tashlash"
+                title={t('books.removeCategory')}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             </span>
           )}
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Ko'rsatilmoqda:{' '}
+            {t('books.showing')}{' '}
             <span className="font-semibold text-slate-900 dark:text-white">
               {filtered.length}
             </span>{' '}
@@ -194,7 +197,7 @@ export default function Books() {
           {hasActiveFilters && (
             <Button variant="ghost" size="sm" onClick={clearFilters}>
               <X className="h-3.5 w-3.5" />
-              Filtrlarni tozalash
+              {t('books.clearFilters')}
             </Button>
           )}
         </div>
@@ -209,7 +212,7 @@ export default function Books() {
             }`}
           >
             <LayoutGrid className="h-4 w-4" />
-            Grid
+            {t('books.grid')}
           </button>
           <button
             type="button"
@@ -221,7 +224,7 @@ export default function Books() {
             }`}
           >
             <List className="h-4 w-4" />
-            Jadval
+            {t('books.table')}
           </button>
         </div>
       </div>
@@ -230,11 +233,11 @@ export default function Books() {
         <Card>
           <EmptyState
             icon={BookX}
-            title="Kitoblar topilmadi"
-            description="Qidiruv va filtr parametrlariga mos kitob topilmadi. Filtrlarni o'zgartirib qaytadan urinib ko'ring."
+            title={t('books.notFound')}
+            description={t('books.notFoundDesc')}
             action={
               hasActiveFilters
-                ? { label: 'Filtrlarni tozalash', onClick: clearFilters }
+                ? { label: t('books.clearFilters'), onClick: clearFilters }
                 : undefined
             }
           />
@@ -273,12 +276,12 @@ export default function Books() {
                       {book.subject}
                     </span>
                     <span className="text-slate-400 dark:text-slate-500">
-                      Raf: {book.shelfNumber}
+                      {t('books.shelf')} {book.shelfNumber}
                     </span>
                   </div>
                   <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 dark:border-slate-700">
                     <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                      Mavjud: {book.availableCopies} / {book.totalCopies}
+                      {t('books.available')} {book.availableCopies} / {book.totalCopies}
                     </span>
                   </div>
                   {bookRating(book.id) && (
@@ -301,13 +304,13 @@ export default function Books() {
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-700/50 dark:text-slate-400">
-                  <th className="px-4 py-3">ID</th>
-                  <th className="px-4 py-3">Nomi</th>
-                  <th className="px-4 py-3">Muallif</th>
-                  <th className="px-4 py-3">Fan</th>
-                  <th className="px-4 py-3">Holat</th>
-                  <th className="px-4 py-3">Mavjud</th>
-                  <th className="px-4 py-3">Raf</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.id')}</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.name')}</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.author')}</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.subject')}</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.status')}</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.available')}</th>
+                  <th className="px-4 py-3">{t('books.tableHeaders.shelf')}</th>
                 </tr>
               </thead>
               <tbody>

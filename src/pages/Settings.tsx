@@ -8,6 +8,7 @@ import { useToast } from '../components/ui/Toast';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const inputClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-400/20 transition-colors';
@@ -19,6 +20,7 @@ export default function Settings() {
   const { settings, updateSettings } = useApp();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [form, setForm] = useState<SystemSettings>(settings);
 
@@ -38,7 +40,7 @@ export default function Settings() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     updateSettings(form);
-    showToast("Sozlamalar muvaffaqiyatli saqlandi", 'success');
+    showToast(t('misc.settingsSaved'), 'success');
   };
 
   return (
@@ -49,26 +51,24 @@ export default function Settings() {
         </span>
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Tizim sozlamalari
+            {t('settings.title')}
           </h1>
           <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-            Kutubxona tizimining umumiy sozlamalarini boshqaring
+            {t('settings.subtitle')}
           </p>
         </div>
       </div>
 
       <div className="flex items-start gap-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200 animate-fade-in">
         <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
-        <p>
-          <strong>Diqqat!</strong> Bu o'zgarishlar tizimga ta'sir qiladi.
-        </p>
+        <p>{t('settings.warning')}</p>
       </div>
 
       <Card className="animate-fade-in">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className={labelClass}>Maktab nomi</label>
+              <label className={labelClass}>{t('settings.schoolName')}</label>
               <input
                 type="text"
                 className={inputClass}
@@ -77,7 +77,7 @@ export default function Settings() {
               />
             </div>
             <div>
-              <label className={labelClass}>Maktab manzili</label>
+              <label className={labelClass}>{t('settings.schoolAddress')}</label>
               <input
                 type="text"
                 className={inputClass}
@@ -86,7 +86,7 @@ export default function Settings() {
               />
             </div>
             <div>
-              <label className={labelClass}>Maksimal qarz kunlari</label>
+              <label className={labelClass}>{t('settings.maxBorrowDays')}</label>
               <input
                 type="number"
                 min={1}
@@ -96,7 +96,7 @@ export default function Settings() {
               />
             </div>
             <div>
-              <label className={labelClass}>O'quvchi boshiga kitob limiti</label>
+              <label className={labelClass}>{t('settings.maxBooks')}</label>
               <input
                 type="number"
                 min={1}
@@ -108,7 +108,7 @@ export default function Settings() {
           </div>
 
           <div>
-            <span className={labelClass}>Bron qilishga ruxsat</span>
+            <span className={labelClass}>{t('settings.allowReservation')}</span>
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -128,17 +128,17 @@ export default function Settings() {
                 />
               </button>
               <span className="text-sm text-slate-600 dark:text-slate-300">
-                {form.allowReservation ? 'Yoqilgan' : "O'chirilgan"}
+                {form.allowReservation ? t('settings.enabled') : t('settings.disabled')}
               </span>
             </div>
             <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
-              O'quvchilar kitoblarni oldindan bron qilishlari mumkin bo'ladi
+              {t('settings.reservationHint')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className={labelClass}>Kechikish jarimasi (kuniga, so'm)</label>
+              <label className={labelClass}>{t('settings.finePerDay')}</label>
               <input
                 type="number"
                 min={0}
@@ -150,7 +150,7 @@ export default function Settings() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass}>Kutubxona ochilish vaqti</label>
+                <label className={labelClass}>{t('settings.openTime')}</label>
                 <input
                   type="time"
                   className={inputClass}
@@ -159,7 +159,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className={labelClass}>Kutubxona yopilish vaqti</label>
+                <label className={labelClass}>{t('settings.closeTime')}</label>
                 <input
                   type="time"
                   className={inputClass}
@@ -172,7 +172,7 @@ export default function Settings() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className={labelClass}>Kutubxona telefoni</label>
+              <label className={labelClass}>{t('settings.phone')}</label>
               <input
                 type="text"
                 className={inputClass}
@@ -181,7 +181,7 @@ export default function Settings() {
               />
             </div>
             <div>
-              <label className={labelClass}>Kutubxona emaili</label>
+              <label className={labelClass}>{t('settings.email')}</label>
               <input
                 type="email"
                 className={inputClass}
@@ -194,7 +194,7 @@ export default function Settings() {
           <div className="flex justify-end border-t border-slate-200 pt-4 dark:border-slate-700">
             <Button type="submit">
               <Save className="h-4 w-4" />
-              Saqlash
+              {t('settings.save')}
             </Button>
           </div>
         </form>

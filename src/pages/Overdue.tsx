@@ -10,6 +10,7 @@ import {
   User,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import type { BorrowRecord } from '../types';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -18,6 +19,7 @@ import EmptyState from '../components/ui/EmptyState';
 import { formatDate, getRelativeDays } from '../utils/helpers';
 
 function OverdueCard({ borrow }: { borrow: BorrowRecord }) {
+  const { t } = useTranslation();
   const { users, books, returnBook } = useApp();
 
   const student = users.find((u) => u.id === borrow.studentId);
@@ -38,7 +40,7 @@ function OverdueCard({ borrow }: { borrow: BorrowRecord }) {
                   {borrow.studentName}
                 </p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {student?.grade ? `${student.grade}-sinf` : 'Sinf aniqlanmagan'}
+                  {student?.grade ? `${student.grade}-sinf` : t('overdue.grade')}
                 </p>
               </div>
             </div>
@@ -71,15 +73,15 @@ function OverdueCard({ borrow }: { borrow: BorrowRecord }) {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
             <span className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
               <CalendarDays className="h-4 w-4 text-slate-400" />
-              Berilgan: {formatDate(borrow.issuedDate)}
+              {t('dashboard.issueDate')}: {formatDate(borrow.issuedDate)}
             </span>
             <span className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
               <CalendarDays className="h-4 w-4 text-slate-400" />
-              Qaytarish muddati: {formatDate(borrow.dueDate)}
+              {t('dashboard.dueDate')}: {formatDate(borrow.dueDate)}
             </span>
             <Badge variant="danger" size="md" className="gap-1">
               <AlertTriangle className="h-3.5 w-3.5" />
-              {daysOverdue} kun kechikkan
+              {daysOverdue}{t('overdue.daysOverdue')}
             </Badge>
           </div>
         </div>
@@ -92,11 +94,11 @@ function OverdueCard({ borrow }: { borrow: BorrowRecord }) {
             className="flex-1 lg:flex-none"
           >
             <RotateCcw className="h-4 w-4" />
-            Qaytarish
+            {t('overdue.returnBtn')}
           </Button>
           <Button size="sm" variant="outline" className="flex-1 lg:flex-none">
             <Phone className="h-4 w-4" />
-            {student?.phone || "Bog'lanish"}
+            {student?.phone || t('overdue.contact')}
           </Button>
         </div>
       </div>
@@ -105,6 +107,7 @@ function OverdueCard({ borrow }: { borrow: BorrowRecord }) {
 }
 
 export default function Overdue() {
+  const { t } = useTranslation();
   const { borrows } = useApp();
 
   const overdueBooks = useMemo(
@@ -124,10 +127,10 @@ export default function Overdue() {
     <div className="space-y-6">
       <div className="animate-fade-in">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Kechikkan kitoblar
+          {t('overdue.title')}
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Muddati o'tgan kitoblar ro'yxati va o'quvchilar bilan bog'lanish
+          {t('overdue.subtitle')}
         </p>
       </div>
 
@@ -138,10 +141,10 @@ export default function Overdue() {
           </span>
           <div>
             <p className="text-base font-semibold text-red-700 dark:text-red-400">
-              Sizda {overdueBooks.length} ta kechikkan kitob bor!
+              Sizda {overdueBooks.length}{t('overdue.countWarning')}
             </p>
             <p className="text-sm text-red-600/80 dark:text-red-400/80">
-              Ushbu kitoblar kutubxonaga qaytarilishi kerak
+              {t('overdue.warningDesc')}
             </p>
           </div>
         </div>
@@ -152,10 +155,10 @@ export default function Overdue() {
           </span>
           <div>
             <p className="text-base font-semibold text-emerald-700 dark:text-emerald-400">
-              Tabriklaymiz! Kechikkan kitoblar yo'q.
+              {t('overdue.allClear')}
             </p>
             <p className="text-sm text-emerald-600/80 dark:text-emerald-400/80">
-              Barcha kitoblar o'z vaqtida qaytarilmoqda
+              {t('overdue.allClearDesc')}
             </p>
           </div>
         </div>
@@ -165,8 +168,8 @@ export default function Overdue() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={CheckCircle}
-            title="Tabriklaymiz! Kechikkan kitoblar yo'q."
-            description="Barcha o'quvchilar kitoblarni o'z vaqtida qaytarishmoqda."
+            title={t('overdue.allClear')}
+            description={t('overdue.allReturned')}
           />
         </Card>
       ) : (

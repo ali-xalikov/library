@@ -13,6 +13,7 @@ import {
   getProfiles,
   updateProfile,
 } from '../services/profiles.api';
+import { useTranslation } from '../i18n/LanguageContext';
 
 export interface RegisterInput {
   firstName: string;
@@ -43,29 +44,30 @@ function splitName(fullName: string): { firstName: string; lastName: string } {
   return { firstName: parts[0] ?? '', lastName: parts.slice(1).join(' ') };
 }
 
-function toAuthMessage(err: unknown): string {
+function toAuthMessage(err: unknown, t: (key: string) => string): string {
   if (err instanceof ApiError) {
     if (err.status === 401 || err.status === 404) {
-      return "Email yoki parol noto'g'ri";
+      return t('errors.invalidCredentials');
     }
-    if (err.status === 403) return "Kirish o'chirilgan";
+    if (err.status === 403) return t('errors.accessDenied');
     return err.message;
   }
-  return "Server bilan bog'lanib bo'lmadi";
+  return t('errors.serverError');
 }
 
-function bannerLoading(): ReactNode {
+function bannerLoading(label: string): ReactNode {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
       <div className="flex items-center gap-3 text-slate-400">
         <span className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-primary-500" />
-        <span className="text-sm">Yuklanmoqda...</span>
+        <span className="text-sm">{label}</span>
       </div>
     </div>
   );
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
 
@@ -115,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(profile);
       return { success: true, message: `Xush kelibsiz, ${profile.firstName}!` };
     } catch (err) {
-      return { success: false, message: toAuthMessage(err) };
+      return { success: false, message: toAuthMessage(err, t) };
     }
   };
 
@@ -140,7 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         message: `${data.firstName}, hisobingiz yaratildi. Xush kelibsiz!`,
       };
     } catch (err) {
-      return { success: false, message: toAuthMessage(err) };
+      return { success: false, message: toAuthMessage(err, t) };
     }
   };
 
@@ -163,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{ user, authReady, login, register, logout, updateCurrentUser }}
     >
-      {authReady ? children : bannerLoading()}
+      {authReady ? children : bannerLoading(t('misc.loading'))}
     </AuthContext.Provider>
   );
 }

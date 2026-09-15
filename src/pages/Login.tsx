@@ -16,26 +16,27 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/ui/Button';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const DEMO_PASSWORD = 'demo123';
 
 const demoAccounts = [
   {
-    role: 'Admin',
+    roleKey: 'role.admin',
     name: 'Administrator',
     email: 'admin@school.uz',
     icon: ShieldCheck,
     iconClass: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   },
   {
-    role: 'Kutubxonachi',
+    roleKey: 'role.librarian',
     name: 'Nodira Karimova',
     email: 'nodira.karimova@school.uz',
     icon: BookMarked,
     iconClass: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
   },
   {
-    role: "O'quvchi",
+    roleKey: 'role.student',
     name: 'Aziz Rahimov',
     email: 'aziz.rahimov@student.school.uz',
     icon: GraduationCap,
@@ -49,6 +50,7 @@ const inputClass =
 export default function Login() {
   const { user, login } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -88,7 +90,7 @@ export default function Login() {
         </div>
         <div>
           <p className="text-sm font-bold text-white">Qarshi shahar 23-maktab</p>
-          <p className="text-[11px] text-primary-200">Maktab Kutubxonasi Boshqaruv Tizimi</p>
+          <p className="text-[11px] text-primary-200">{t('app.subtitle')}</p>
         </div>
       </div>
 
@@ -103,13 +105,13 @@ export default function Login() {
             <BookOpen className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-3">Qarshi shahar 23-maktab</h1>
-          <p className="text-lg text-primary-200 mb-10">Maktab Kutubxonasi Boshqaruv Tizimi</p>
+          <p className="text-lg text-primary-200 mb-10">{t('app.subtitle')}</p>
 
           <div className="space-y-3 text-left">
             {[
-              'Kitoblar fondini to\'liq boshqaring',
-              'O\'quvchilarga kitob berish va qaytarishni nazorat qiling',
-              'Statistikalar va hisobotlar bilan tanishib boring',
+              t('login.features.1'),
+              t('login.features.2'),
+              t('login.features.3'),
             ].map((feature) => (
               <div
                 key={feature}
@@ -132,21 +134,21 @@ export default function Login() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Tizimga kirish</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">{t('login.title')}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
-            Hisobingiz bilan kiring yoki{' '}
+            {t('login.subtitle')}{' '}
             <Link
               to="/register"
               className="font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
-              ro'yxatdan o'ting
+              {t('login.register')}
             </Link>
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Elektron pochta
+                {t('login.email')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -163,7 +165,7 @@ export default function Login() {
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Parol
+                {t('login.password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -179,7 +181,7 @@ export default function Login() {
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                  aria-label={showPassword ? 'Parolni yashirish' : 'Parolni ko\'rsatish'}
+                  aria-label={showPassword ? t('misc.passwordHide') : t('misc.passwordShow')}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -194,7 +196,7 @@ export default function Login() {
 
             <Button type="submit" size="lg" className="w-full" loading={loading}>
               {!loading && <LogIn className="h-4 w-4" />}
-              Kirish
+              {t('login.submit')}
             </Button>
           </form>
 
@@ -204,7 +206,7 @@ export default function Login() {
               className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
               <UserPlus className="h-4 w-4" />
-              Ro'yxatdan o'tish
+              {t('login.register')}
             </Link>
           </div>
 
@@ -212,7 +214,7 @@ export default function Login() {
             <div className="relative mb-4 text-center">
               <span className="absolute inset-x-0 top-1/2 border-t border-slate-200 dark:border-slate-700" />
               <span className="relative bg-slate-50 dark:bg-slate-950 px-3 text-xs font-medium text-slate-400">
-                Demo hisoblar — parol: demo123
+                {t('login.demoAccounts')}
               </span>
             </div>
 
@@ -238,7 +240,7 @@ export default function Login() {
                       </span>
                     </span>
                     <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                      {account.role}
+                      {t(account.roleKey)}
                     </span>
                   </button>
                 );

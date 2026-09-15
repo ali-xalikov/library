@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
@@ -39,38 +40,39 @@ const typeConfig: Record<
   },
 };
 
-function getRelativeTime(dateString: string): string {
+function getRelativeTime(dateString: string, t: (key: string) => string): string {
   const now = new Date();
   const date = new Date(dateString);
   const diffMs = now.getTime() - date.getTime();
   const minutes = Math.floor(diffMs / (1000 * 60));
 
-  if (minutes < 1) return 'hozirgina';
-  if (minutes < 60) return `${minutes} daqiqa oldin`;
+  if (minutes < 1) return t('time.justNow');
+  if (minutes < 60) return `${minutes}${t('time.minutesAgo')}`;
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} soat oldin`;
+  if (hours < 24) return `${hours}${t('time.hoursAgo')}`;
 
   const days = Math.floor(hours / 24);
-  if (days < 30) return `${days} kun oldin`;
+  if (days < 30) return `${days}${t('time.daysAgo')}`;
 
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months} oy oldin`;
+  if (months < 12) return `${months}${t('time.monthsAgo')}`;
 
   const years = Math.floor(months / 12);
-  return `${years} yil oldin`;
+  return `${years}${t('time.yearsAgo')}`;
 }
 
-const filters: { key: Filter; label: string }[] = [
-  { key: 'all', label: 'Barcha' },
-  { key: 'unread', label: "O'qilmagan" },
-  { key: 'read', label: "O'qilgan" },
-];
-
 export default function Notifications() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { notifications, markNotificationRead, markAllNotificationsRead } = useApp();
   const [filter, setFilter] = useState<Filter>('all');
+
+  const filterLabels: { key: Filter; label: string }[] = [
+    { key: 'all', label: t('notifications.all') },
+    { key: 'unread', label: t('notifications.unreadLabel') },
+    { key: 'read', label: t('notifications.read') },
+  ];
 
   const userNotifications =
     user?.role === 'admin'
@@ -92,21 +94,21 @@ export default function Notifications() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Bildirishnomalar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('notifications.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {unreadCount > 0
-              ? `${unreadCount} ta o'qilmagan bildirishnoma mavjud`
-              : "Barcha bildirishnomalar o'qilgan"}
+              ? `${unreadCount}${t('notifications.unread')}`
+              : t('notifications.allRead')}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={markAllNotificationsRead}>
           <CheckCheck className="h-4 w-4" />
-          Hammasini o'qilgan qilish
+          {t('notifications.markAllRead')}
         </Button>
       </div>
 
       <div className="flex items-center gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800 animate-fade-in">
-        {filters.map((f) => (
+        {filterLabels.map((f) => (
           <button
             key={f.key}
             onClick={() => setFilter(f.key)}
@@ -125,8 +127,8 @@ export default function Notifications() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={Bell}
-            title={filter === 'all' ? "Bildirishnomalar yo'q" : 'Bunday bildirishnomalar yo\'q'}
-            description="Yangi bildirishnomalar kelishi bilan shu yerda ko'rsatiladi."
+            title={t('notifications.empty')}
+            description={t('notifications.emptyDesc')}
           />
         </Card>
       ) : (
@@ -164,12 +166,12 @@ export default function Notifications() {
                           className="shrink-0"
                           onClick={() => markNotificationRead(n.id)}
                         >
-                          O'qish
+                          {t('notifications.readBtn')}
                         </Button>
                       )}
                     </div>
                     <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
-                      {getRelativeTime(n.createdAt)}
+                      {getRelativeTime(n.createdAt, t)}
                     </p>
                   </div>
                 </div>

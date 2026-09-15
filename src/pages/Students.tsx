@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import type { Grade, User } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -51,6 +52,7 @@ function StudentAvatar({ student }: { student: User }) {
 }
 
 export default function Students() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { users, borrows, addStudent } = useApp();
   const navigate = useNavigate();
@@ -144,14 +146,14 @@ export default function Students() {
     <div className="space-y-6">
       <div className="flex animate-fade-in flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">O'quvchilar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('students.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Jami {students.length} nafar o'quvchi ro'yxatga olingan
+            Jami {students.length} {t('students.subtitle')}
           </p>
         </div>
         <Button onClick={() => setModalOpen(true)}>
           <UserPlus className="h-4 w-4" />
-          Yangi o'quvchi
+          {t('students.newStudent')}
         </Button>
       </div>
 
@@ -162,7 +164,7 @@ export default function Students() {
             setSearch(e.target.value);
             setCurrentPage(1);
           }}
-          placeholder="Ism, email yoki QR kod bo'yicha qidirish..."
+          placeholder={t('students.search')}
           className="flex-1"
         />
         <div className="w-full sm:w-48">
@@ -173,7 +175,7 @@ export default function Students() {
               setCurrentPage(1);
             }}
             options={gradeOptions}
-            placeholder="Barcha sinflar"
+            placeholder={t('students.allGrades')}
           />
         </div>
       </div>
@@ -182,9 +184,9 @@ export default function Students() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={Users}
-            title="O'quvchi topilmadi"
-            description="Qidiruv shartlariga mos o'quvchi topilmadi. Yangi o'quvchi qo'shib ko'ring."
-            action={{ label: "Yangi o'quvchi", onClick: () => setModalOpen(true) }}
+            title={t('students.notFound')}
+            description={t('students.notFoundDesc')}
+            action={{ label: t('students.newStudent'), onClick: () => setModalOpen(true) }}
           />
         </Card>
       ) : (
@@ -229,14 +231,14 @@ export default function Students() {
 
                     <div className="mt-4 flex items-center justify-between gap-2">
                       <Badge variant={count > 0 ? 'warning' : 'default'} size="md">
-                        {count > 0 ? `${count} ta faol kitob` : "Kitoblar yo'q"}
+                        {count > 0 ? `${count}${t('students.activeBooks')}` : t('students.noBooks')}
                       </Badge>
                       <Link
                         to={`/students/${student.id}`}
                         onClick={(e) => e.stopPropagation()}
                         className="inline-flex items-center rounded-lg bg-primary-50 px-3 py-1.5 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50"
                       >
-                        Profil
+                        {t('students.profile')}
                       </Link>
                     </div>
                   </div>
@@ -251,12 +253,12 @@ export default function Students() {
         </>
       )}
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Yangi o'quvchi qo'shish">
+      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={t('students.addTitle')}>
         <form onSubmit={handleAddStudent} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Ism
+                {t('students.firstName')}
               </label>
               <input
                 value={firstName}
@@ -268,7 +270,7 @@ export default function Students() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Familiya
+                {t('students.lastName')}
               </label>
               <input
                 value={lastName}
@@ -282,7 +284,7 @@ export default function Students() {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Elektron pochta
+              {t('students.email')}
             </label>
             <input
               type="email"
@@ -297,13 +299,13 @@ export default function Students() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Sinf
+                {t('students.grade')}
               </label>
               <Select value={newGrade} onChange={(e) => setNewGrade(e.target.value)} options={gradeOptions} />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Telefon (ixtiyoriy)
+                {t('students.phoneOptional')}
               </label>
               <input
                 type="tel"

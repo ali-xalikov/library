@@ -37,7 +37,7 @@ const accounts = [
   {
     fullName: 'Administrator',
     email: 'admin@school.uz',
-    profile: { firstName: 'Administrator', lastName: 'Admin', role: 'admin' },
+    profile: { firstName: 'Direktor', lastName: 'Direktor', role: 'admin' },
   },
   {
     fullName: 'Nodira Karimova',

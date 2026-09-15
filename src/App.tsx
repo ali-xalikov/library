@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppProvider } from './context/AppContext';
 import { ToastProvider } from './components/ui/Toast';
+import { LanguageProvider } from './i18n/LanguageContext';
 import Layout from './components/layout/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -30,42 +31,44 @@ import Chat from './pages/Chat';
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppProvider>
-          <ToastProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/books" element={<Books />} />
-                <Route path="/books/new" element={<AddBook />} />
-                <Route path="/books/:id/edit" element={<AddBook />} />
-                <Route path="/books/:id" element={<BookDetail />} />
-                <Route path="/online-library" element={<OnlineLibrary />} />
-                <Route path="/online-reader/:bookId" element={<OnlineReader />} />
-                <Route path="/students" element={<Students />} />
-                <Route path="/students/:id" element={<StudentProfile />} />
-                <Route path="/my-books" element={<MyBooks />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/issue-book" element={<IssueBook />} />
-                <Route path="/return-book" element={<ReturnBook />} />
-                <Route path="/reservations" element={<Reservations />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/overdue" element={<Overdue />} />
-                <Route path="/reports" element={<Reports />} />
-                <Route path="/notifications" element={<Notifications />} />
-                <Route path="/chat" element={<Chat />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/librarians" element={<Librarians />} />
-                <Route path="/categories" element={<Categories />} />
-                <Route path="*" element={<Dashboard />} />
-              </Route>
-            </Routes>
-          </ToastProvider>
-        </AppProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ToastProvider>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/books" element={<Books />} />
+                  <Route path="/books/new" element={<AddBook />} />
+                  <Route path="/books/:id/edit" element={<AddBook />} />
+                  <Route path="/books/:id" element={<BookDetail />} />
+                  <Route path="/online-library" element={<OnlineLibrary />} />
+                  <Route path="/online-reader/:bookId" element={<OnlineReader />} />
+                  <Route path="/students" element={<Students />} />
+                  <Route path="/students/:id" element={<StudentProfile />} />
+                  <Route path="/my-books" element={<MyBooks />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/issue-book" element={<IssueBook />} />
+                  <Route path="/return-book" element={<ReturnBook />} />
+                  <Route path="/reservations" element={<Reservations />} />
+                  <Route path="/history" element={<History />} />
+                  <Route path="/overdue" element={<Overdue />} />
+                  <Route path="/reports" element={<Reports />} />
+                  <Route path="/notifications" element={<Notifications />} />
+                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/users" element={<Users />} />
+                  <Route path="/librarians" element={<Librarians />} />
+                  <Route path="/categories" element={<Categories />} />
+                  <Route path="*" element={<Dashboard />} />
+                </Route>
+              </Routes>
+            </ToastProvider>
+          </AppProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </BrowserRouter>
   );
 }

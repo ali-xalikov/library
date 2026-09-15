@@ -18,6 +18,7 @@ import {
 import type { Book, User } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { calculateDueDate, formatDate } from '../utils/helpers';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -32,6 +33,7 @@ function getInitials(firstName: string, lastName: string): string {
 export default function IssueBook() {
   const { user: currentUser } = useAuth();
   const { users, books, borrows, settings, issueBook } = useApp();
+  const { t } = useTranslation();
 
   const [step, setStep] = useState(1);
   const [studentSearch, setStudentSearch] = useState('');
@@ -141,17 +143,17 @@ export default function IssueBook() {
   return (
     <div className="space-y-6">
       <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Kitob berish</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('issueBook.title')}</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          O'quvchiga kitobni rasmiy qarzga berish jarayoni
+          {t('issueBook.subtitle')}
         </p>
       </div>
 
       <div className="flex animate-fade-in items-center gap-2 sm:gap-3">
         {[
-          { num: 1, label: "O'quvchi" },
-          { num: 2, label: 'Kitob' },
-          { num: 3, label: 'Tasdiqlash' },
+          { num: 1, label: t('issueBook.step1') },
+          { num: 2, label: t('issueBook.step2') },
+          { num: 3, label: t('issueBook.step3') },
         ].map((s, index) => (
           <Fragment key={s.num}>
             <div className="flex items-center gap-2">
@@ -208,10 +210,10 @@ export default function IssueBook() {
           </span>
           <div>
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              O'quvchini toping
+              {t('issueBook.findStudent')}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Ism, QR kod yoki ID bo'yicha qidirish
+              {t('issueBook.findStudentHint')}
             </p>
           </div>
           <BookUser className="ml-auto h-5 w-5 text-slate-300 dark:text-slate-600" />
@@ -220,15 +222,15 @@ export default function IssueBook() {
         <SearchInput
           value={studentSearch}
           onChange={(e) => setStudentSearch(e.target.value)}
-          placeholder="O'quvchi ismi, QR kodi yoki ID..."
+          placeholder={t('issueBook.findStudentHint')}
         />
 
         <div className="mt-4 max-h-72 space-y-2 overflow-y-auto pr-1">
           {filteredStudents.length === 0 ? (
             <EmptyState
               icon={UserRound}
-              title="O'quvchi topilmadi"
-              description="Qidiruv shartlariga mos o'quvchi yo'q."
+              title={t('issueBook.studentNotFound')}
+              description={t('issueBook.studentNotFoundDesc')}
             />
           ) : (
             filteredStudents.map((student) => {
@@ -286,10 +288,10 @@ export default function IssueBook() {
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 dark:border-emerald-800 dark:bg-emerald-900/20">
             <div className="min-w-0">
               <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-300">
-                Tanlangan: {selectedStudent.firstName} {selectedStudent.lastName}
+                {t('issueBook.selected')} {selectedStudent.firstName} {selectedStudent.lastName}
               </p>
               <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                {selectedStudent.grade}-sinf · Hozir {selectedBorrowCount} ta aktiv kitob
+                {selectedStudent.grade}-sinf · Hozir {selectedBorrowCount}{t('issueBook.activeLoans')}
                 {settings.maxBooksPerStudent > 0 &&
                   ` / ${settings.maxBooksPerStudent} ta limit`}
               </p>
@@ -298,7 +300,7 @@ export default function IssueBook() {
               onClick={() => setStep(2)}
               disabled={selectedBorrowCount >= settings.maxBooksPerStudent}
             >
-              Keyingisi
+              {t('issueBook.next')}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
@@ -313,10 +315,10 @@ export default function IssueBook() {
             </span>
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Kitobni tanlang
+                {t('issueBook.selectBook')}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Faqat mavjud nusxali kitoblar ko'rsatiladi
+                {t('issueBook.selectBookHint')}
               </p>
             </div>
             <BookMarked className="ml-auto h-5 w-5 text-slate-300 dark:text-slate-600" />
@@ -325,15 +327,15 @@ export default function IssueBook() {
           <SearchInput
             value={bookSearch}
             onChange={(e) => setBookSearch(e.target.value)}
-            placeholder="Kitob nomi, muallifi yoki inventar raqami..."
+            placeholder={t('issueBook.selectBookHint')}
           />
 
           <div className="mt-4 max-h-96 space-y-2 overflow-y-auto pr-1">
             {filteredBooks.length === 0 ? (
               <EmptyState
                 icon={BookOpen}
-                title="Kitob topilmadi"
-                description="Mavjud nusxali kitob topilmadi yoki qidiruv natijasi yo'q."
+              title={t('issueBook.bookNotFound')}
+              description={t('issueBook.bookNotFoundDesc')}
               />
             ) : (
               filteredBooks.map((book) => {
@@ -363,7 +365,7 @@ export default function IssueBook() {
                     <div className="flex shrink-0 items-center gap-2">
                       <Badge variant="success" size="sm">
                         <Layers className="mr-1 h-3 w-3" />
-                        {book.availableCopies} nusxa mavjud
+                        {book.availableCopies}{t('issueBook.copiesAvailable')}
                       </Badge>
                       <Badge variant="default" size="sm">
                         <Landmark className="mr-1 h-3 w-3" />
@@ -382,11 +384,11 @@ export default function IssueBook() {
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(1)}>
               <ArrowLeft className="h-4 w-4" />
-              Orqaga
+              {t('issueBook.back')}
             </Button>
             {selectedBook && (
               <Button onClick={() => setStep(3)}>
-                Keyingisi
+                {t('issueBook.next')}
                 <ArrowRight className="h-4 w-4" />
               </Button>
             )}
@@ -402,10 +404,10 @@ export default function IssueBook() {
             </span>
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Qarzni tasdiqlash
+                {t('issueBook.confirmLoan')}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Berilgan ma'lumotlarni tekshiring va tasdiqlang
+                {t('issueBook.confirmLoanHint')}
               </p>
             </div>
           </div>
@@ -414,7 +416,7 @@ export default function IssueBook() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
               <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <UserRound className="h-4 w-4" />
-                O'quvchi
+                {t('issueBook.step1')}
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {selectedStudent.firstName} {selectedStudent.lastName}
@@ -430,7 +432,7 @@ export default function IssueBook() {
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40">
               <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
                 <BookOpen className="h-4 w-4" />
-                Kitob
+                {t('issueBook.step2')}
               </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {selectedBook.title}
@@ -450,7 +452,7 @@ export default function IssueBook() {
                 <Search className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Berilgan sana</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('issueBook.issueDate')}</p>
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">
                   {formatDate(issuedDate.toISOString())}
                 </p>
@@ -461,7 +463,7 @@ export default function IssueBook() {
                 <Landmark className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Qaytarish muddati</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('issueBook.dueDate')}</p>
                 <p className="text-sm font-semibold text-slate-900 dark:text-white">
                   {formatDate(dueDate)} ({settings.maxBorrowDays} kun)
                 </p>
@@ -472,11 +474,11 @@ export default function IssueBook() {
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <Button variant="outline" onClick={() => setStep(2)}>
               <ArrowLeft className="h-4 w-4" />
-              Orqaga
+              {t('issueBook.back')}
             </Button>
             <Button size="lg" onClick={handleConfirm} loading={loading}>
               <Check className="h-4 w-4" />
-              Tasdiqlash
+              {t('issueBook.confirm')}
             </Button>
           </div>
         </Card>

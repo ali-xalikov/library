@@ -24,6 +24,7 @@ import {
   Download,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
@@ -32,7 +33,6 @@ import Badge from '../components/ui/Badge';
 import EmptyState from '../components/ui/EmptyState';
 import {
   formatDate,
-  getBookStatusLabel,
   getDaysRemainingText,
   getRelativeDays,
   getTopBooks,
@@ -92,6 +92,7 @@ function SectionHeader({
 export default function Reports() {
   const { books, borrows } = useApp();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   if (user?.role !== 'admin' && user?.role !== 'librarian') {
     return <Navigate to="/" replace />;
@@ -117,9 +118,9 @@ export default function Reports() {
   return (
     <div className="space-y-6">
       <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Hisobotlar</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('reports.title')}</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Kutubxona faoliyati bo'yicha batafsil statistika va hisobotlar
+          {t('reports.subtitle')}
         </p>
       </div>
 
@@ -127,7 +128,7 @@ export default function Reports() {
         <Card className="animate-fade-in">
           <SectionHeader
             icon={BookOpen}
-            title="Eng ko'p o'qilgan kitoblar"
+            title={t('reports.topBooks')}
             onExport={() =>
               exportToCSV(
                 topBooks.map((b, i) => ({ '#': i + 1, Kitob: b.title, Berilgan: b.count })),
@@ -138,8 +139,8 @@ export default function Reports() {
           {topBooks.length === 0 ? (
             <EmptyState
               icon={BookOpen}
-              title="Ma'lumot yo'q"
-              description="Hozircha qarz berish bo'yicha statistika mavjud emas."
+              title={t('reports.noData')}
+              description={t('reports.noDataDesc')}
             />
           ) : (
             <>
@@ -157,7 +158,7 @@ export default function Reports() {
                   <thead>
                     <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
                       <th className="px-4 py-2.5 text-left font-medium text-slate-500 dark:text-slate-400">#</th>
-                      <th className="px-4 py-2.5 text-left font-medium text-slate-500 dark:text-slate-400">Kitob nomi</th>
+                      <th className="px-4 py-2.5 text-left font-medium text-slate-500 dark:text-slate-400">{t('reports.bookName')}</th>
                       <th className="px-4 py-2.5 text-right font-medium text-slate-500 dark:text-slate-400">Berilgan</th>
                     </tr>
                   </thead>
@@ -170,7 +171,7 @@ export default function Reports() {
                         <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">{i + 1}</td>
                         <td className="px-4 py-2.5 font-medium text-slate-900 dark:text-white">{b.title}</td>
                         <td className="px-4 py-2.5 text-right">
-                          <Badge variant="info">{b.count} marta</Badge>
+                          <Badge variant="info">{b.count}{t('reports.times')}</Badge>
                         </td>
                       </tr>
                     ))}
@@ -184,7 +185,7 @@ export default function Reports() {
         <Card className="animate-fade-in">
           <SectionHeader
             icon={Users}
-            title="Eng faol o'quvchilar"
+            title={t('reports.activeStudents')}
             onExport={() =>
               exportToCSV(
                 activeStudents.map((s, i) => ({ '#': i + 1, Oquvchi: s.name, Kitoblar: s.count })),
@@ -195,8 +196,8 @@ export default function Reports() {
           {activeStudents.length === 0 ? (
             <EmptyState
               icon={Users}
-              title="Ma'lumot yo'q"
-              description="Hozircha qarz berish bo'yicha statistika mavjud emas."
+              title={t('reports.noData')}
+              description={t('reports.noDataDesc')}
             />
           ) : (
             <>
@@ -241,7 +242,7 @@ export default function Reports() {
         <Card className="animate-fade-in">
           <SectionHeader
             icon={PieChartIcon}
-            title="Fanlar bo'yicha kitoblar"
+            title={t('reports.subjectBooks')}
             onExport={() =>
               exportToCSV(
                 subjectData.map((s) => ({ Fan: s.subject, Kitoblar: s.count })),
@@ -252,7 +253,7 @@ export default function Reports() {
           {subjectData.length === 0 ? (
             <EmptyState
               icon={PieChartIcon}
-              title="Ma'lumot yo'q"
+              title={t('reports.noData')}
               description="Kutubxona fondida kitoblar mavjud emas."
             />
           ) : (
@@ -281,7 +282,7 @@ export default function Reports() {
         <Card className="animate-fade-in">
           <SectionHeader
             icon={TrendingUp}
-            title="Oylar bo'yicha statistika"
+            title={t('reports.monthlyStats')}
             onExport={() =>
               exportToCSV(
                 monthlyData.map((m) => ({
@@ -296,7 +297,7 @@ export default function Reports() {
           {monthlyData.length === 0 ? (
             <EmptyState
               icon={TrendingUp}
-              title="Ma'lumot yo'q"
+              title={t('reports.noData')}
               description="Hozircha oylik statistika mavjud emas."
             />
           ) : (
@@ -317,7 +318,7 @@ export default function Reports() {
         <Card className="animate-fade-in xl:col-span-2">
           <SectionHeader
             icon={AlertTriangle}
-            title="Kechikkan kitoblar"
+            title={t('reports.overdueBooks')}
             onExport={() =>
               exportToCSV(
                 overdueBorrows.map((b) => ({
@@ -342,7 +343,7 @@ export default function Reports() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
-                    {["O'quvchi", 'Kitob', 'Berildi', 'Muddat', 'Kechikish'].map((col) => (
+                    {[t('reports.overdueTableHeaders.student'), t('reports.overdueTableHeaders.book'), t('reports.overdueTableHeaders.issued'), t('reports.overdueTableHeaders.due'), t('reports.overdueTableHeaders.delay')].map((col) => (
                       <th
                         key={col}
                         className="px-4 py-2.5 text-left font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap"
@@ -385,7 +386,7 @@ export default function Reports() {
         <Card className="animate-fade-in xl:col-span-2">
           <SectionHeader
             icon={PackageX}
-            title="Yo'qolgan kitoblar"
+            title={t('reports.lostBooks')}
             onExport={() =>
               exportToCSV(
                 lostBooks.map((b) => ({
@@ -424,7 +425,7 @@ export default function Reports() {
                       {b.inventoryNumber} • {b.subject}
                     </p>
                   </div>
-                  <Badge variant="danger">{getBookStatusLabel(b.status)}</Badge>
+                  <Badge variant="danger">{t('status.' + b.status)}</Badge>
                 </div>
               ))}
             </div>

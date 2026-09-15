@@ -6,16 +6,19 @@ import {
   LogOut,
   Menu,
   Moon,
-  Search,
   Settings,
   Sun,
   User as UserIcon,
 } from 'lucide-react';
 import type { Role, User } from '../../types';
 import { classNames } from '../../utils/helpers';
+import { useTranslation } from '../../i18n/LanguageContext';
+import LanguageSwitcher from '../ui/LanguageSwitcher';
 
 interface NavbarProps {
   onSidebarToggle: () => void;
+  onDesktopToggle?: () => void;
+  collapsed?: boolean;
   user?: User;
   onLogout?: () => void;
 }
@@ -23,30 +26,31 @@ interface NavbarProps {
 const NOTIFICATION_COUNT = 3;
 
 const ROLE_LABELS: Record<Role, string> = {
-  admin: 'Admin',
-  librarian: 'Kutubxonachi',
-  student: "O'quvchi",
+  admin: 'admin',
+  librarian: 'librarian',
+  student: 'student',
 };
 
 const PAGE_TITLES: Record<string, string> = {
-  '/': 'Dashboard',
-  '/books': 'Books',
-  '/online-library': 'Online Library',
-  '/my-books': 'My Books',
-  '/profile': 'Profil',
-  '/reservations': 'Reservations',
-  '/issue-book': 'Issue Book',
-  '/return-book': 'Return Book',
-  '/history': 'History',
-  '/overdue': 'Overdue',
-  '/students': 'Students',
-  '/reports': 'Reports',
-  '/notifications': 'Notifications',
-  '/chat': 'Chat',
-  '/users': 'Users',
-  '/librarians': 'Librarians',
-  '/categories': 'Categories',
-  '/settings': 'Settings',
+  '/': 'page.dashboard',
+  '/books': 'page.books',
+  '/books/new': 'page.books',
+  '/online-library': 'page.onlineLibrary',
+  '/my-books': 'page.myBooks',
+  '/profile': 'page.profile',
+  '/reservations': 'page.reservations',
+  '/issue-book': 'page.issueBook',
+  '/return-book': 'page.returnBook',
+  '/history': 'page.history',
+  '/overdue': 'page.overdue',
+  '/students': 'page.students',
+  '/reports': 'page.reports',
+  '/notifications': 'page.notifications',
+  '/chat': 'page.chat',
+  '/users': 'page.users',
+  '/librarians': 'page.librarians',
+  '/categories': 'page.categories',
+  '/settings': 'page.settings',
 };
 
 const DEFAULT_USER: User = {
@@ -61,12 +65,12 @@ const DEFAULT_USER: User = {
 const ICON_BUTTON_CLASS =
   'flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white';
 
-function getPageTitle(pathname: string): string {
-  if (pathname in PAGE_TITLES) return PAGE_TITLES[pathname];
-  if (pathname.startsWith('/books/')) return 'Kitob tafsilotlari';
-  if (pathname.startsWith('/students/')) return 'O\'quvchi profili';
-  if (pathname.startsWith('/online-reader/')) return 'Online o\'qish';
-  return PAGE_TITLES['/'];
+function getPageTitle(pathname: string, t: (key: string) => string): string {
+  if (pathname in PAGE_TITLES) return t(PAGE_TITLES[pathname]);
+  if (pathname.startsWith('/books/')) return t('page.bookDetail');
+  if (pathname.startsWith('/students/')) return t('page.studentProfile');
+  if (pathname.startsWith('/online-reader/')) return t('page.onlineReader');
+  return t(PAGE_TITLES['/']);
 }
 
 function getInitials(firstName: string, lastName: string): string {
@@ -79,6 +83,7 @@ export default function Navbar({
   onLogout,
 }: NavbarProps) {
   const location = useLocation();
+  const { t } = useTranslation();
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     const stored = window.localStorage.getItem('theme');
@@ -106,97 +111,99 @@ export default function Navbar({
   return (
     <header
       className={classNames(
-        'fixed left-0 right-0 top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 px-4',
+        'fixed left-0 right-0 top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 px-3 sm:px-4',
         'bg-white/80 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-900/80'
       )}
     >
-      <div className="flex items-center">
+      {/* Left: hamburger */}
+      <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onSidebarToggle}
-          title="Menyu"
-          aria-label="Menyu"
+          title={t('navbar.menyu')}
+          aria-label={t('navbar.menyu')}
           className={ICON_BUTTON_CLASS}
         >
           <Menu className="h-5 w-5" />
         </button>
       </div>
 
-      <h1 className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 truncate text-base font-semibold text-slate-800 dark:text-slate-100">
-        {getPageTitle(location.pathname)}
+      {/* Center: page title */}
+      <h1 className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[45%] truncate text-sm font-semibold text-slate-800 sm:text-base dark:text-slate-100">
+        {getPageTitle(location.pathname, t)}
       </h1>
 
-      <div className="flex items-center gap-1.5">
-        <button
-          type="button"
-          title="Qidirish"
-          aria-label="Qidirish"
-          className={ICON_BUTTON_CLASS}
-        >
-          <Search className="h-5 w-5" />
-        </button>
+      {/* Right: actions */}
+      <div className="flex items-center gap-0.5 sm:gap-1.5">
+        {/* Language switcher */}
+        <LanguageSwitcher compact />
 
+        {/* Dark mode toggle */}
         <button
           type="button"
           onClick={() => setIsDark((prev) => !prev)}
-          title={isDark ? 'Yorug' : 'Qorongu'}
-          aria-label={isDark ? 'Yorug' : 'Qorongu'}
+          title={isDark ? t('navbar.yorug') : t('navbar.qorongu')}
+          aria-label={isDark ? t('navbar.yorug') : t('navbar.qorongu')}
           className={ICON_BUTTON_CLASS}
         >
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </button>
 
-        <button
-          type="button"
-          title="Bildirishnomalar"
-          aria-label="Bildirishnomalar"
+        {/* Notifications */}
+        <Link
+          to="/notifications"
+          title={t('page.notifications')}
+          aria-label={t('page.notifications')}
           className={classNames(ICON_BUTTON_CLASS, 'relative')}
         >
           <Bell className="h-5 w-5" />
           <span className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
             {NOTIFICATION_COUNT}
           </span>
-        </button>
+        </Link>
 
+        {/* User menu */}
         <div ref={menuRef} className="relative">
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="flex items-center gap-2 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="flex items-center gap-1.5 rounded-lg py-1 pl-1 pr-1.5 sm:pr-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
               {getInitials(user.firstName, user.lastName)}
             </div>
-            <span className="hidden max-w-[120px] truncate text-sm font-medium text-slate-700 dark:text-slate-200 md:block">
-              {user.firstName} {user.lastName}
+            <span className="hidden max-w-[100px] truncate text-sm font-medium text-slate-700 dark:text-slate-200 md:block">
+              {user.firstName}
             </span>
-            <ChevronDown className="h-4 w-4 text-slate-400" />
+            <ChevronDown className="hidden h-4 w-4 text-slate-400 sm:block" />
           </button>
 
           {menuOpen && (
-            <div className="animate-fade-in absolute right-0 top-[calc(100%+8px)] w-60 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
+            <div className="animate-fade-in absolute right-0 top-[calc(100%+8px)] w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
               <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
                 <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                   {user.firstName} {user.lastName}
                 </p>
                 <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
-                  {ROLE_LABELS[user.role]} · {user.email}
+                  {t(`role.${ROLE_LABELS[user.role]}`)} · {user.email}
                 </p>
               </div>
               <div className="p-1.5">
                 <Link
                   to="/profile"
+                  onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/60"
                 >
-                  <UserIcon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-                  Profile
+                  <UserIcon className="h-4 w-4 text-slate-400" />
+                  {t('navbar.profile')}
                 </Link>
                 <Link
                   to="/settings"
+                  onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/60"
                 >
-                  <Settings className="h-4 w-4 text-slate-400 dark:text-slate-500" />
-                  Settings
+                  <Settings className="h-4 w-4 text-slate-400" />
+                  {t('page.settings')}
                 </Link>
                 <div className="my-1 h-px bg-slate-100 dark:bg-slate-700" />
                 <button
@@ -205,7 +212,7 @@ export default function Navbar({
                   className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logout
+                  {t('navbar.logout')}
                 </button>
               </div>
             </div>

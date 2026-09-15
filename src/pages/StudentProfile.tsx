@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { BorrowRecord, Grade, Reservation } from '../types';
+import { useTranslation } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { formatDate, getDaysRemainingText, getRelativeDays } from '../utils/helpers';
@@ -31,17 +32,21 @@ type TabKey = 'current' | 'history' | 'reservations' | 'overdue';
 
 type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
 
-const tabs: { key: TabKey; label: string }[] = [
-  { key: 'current', label: 'Hozirgi kitoblar' },
-  { key: 'history', label: 'Tarix' },
-  { key: 'reservations', label: 'Bronlar' },
-  { key: 'overdue', label: 'Kechikkan kitoblar' },
-];
+function getTabs(t: (key: string) => string): { key: TabKey; label: string }[] {
+  return [
+    { key: 'current', label: t('studentProfile.currentBooks') },
+    { key: 'history', label: t('studentProfile.history') },
+    { key: 'reservations', label: t('studentProfile.reservations') },
+    { key: 'overdue', label: t('studentProfile.overdue') },
+  ];
+}
 
-const gradeOptions = Array.from({ length: 11 }, (_, i) => ({
-  value: String(i + 1),
-  label: `${i + 1}-sinf`,
-}));
+function getGradeOptions(t: (key: string) => string) {
+  return Array.from({ length: 11 }, (_, i) => ({
+    value: String(i + 1),
+    label: t('studentProfile.grade').replace('{grade}', String(i + 1)),
+  }));
+}
 
 const inputClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-primary-400 dark:focus:ring-primary-400/20 transition-colors';
@@ -57,43 +62,47 @@ function isOverdueBorrow(borrow: BorrowRecord): boolean {
   );
 }
 
-const borrowStatusMeta: Record<
+function getBorrowStatusMeta(t: (key: string) => string): Record<
   string,
   { variant: BadgeVariant; label: string }
-> = {
-  active: { variant: 'info', label: 'Faol' },
-  returned: { variant: 'success', label: 'Qaytarilgan' },
-  overdue: { variant: 'danger', label: "Muddati o'tgan" },
-};
+> {
+  return {
+    active: { variant: 'info', label: t('status.active') },
+    returned: { variant: 'success', label: t('status.returned') },
+    overdue: { variant: 'danger', label: t('status.overdue') },
+  };
+}
 
-function BorrowStatusBadge({ status }: { status: string }) {
-  const meta = borrowStatusMeta[status] ?? { variant: 'default' as BadgeVariant, label: status };
+function BorrowStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
+  const meta = getBorrowStatusMeta(t)[status] ?? { variant: 'default' as BadgeVariant, label: status };
   return <Badge variant={meta.variant} size="sm">{meta.label}</Badge>;
 }
 
-const reservationStatusMeta: Record<
+function getReservationStatusMeta(t: (key: string) => string): Record<
   string,
   { variant: BadgeVariant; label: string }
-> = {
-  pending: { variant: 'warning', label: 'Kutilmoqda' },
-  approved: { variant: 'info', label: 'Tasdiqlangan' },
-  fulfilled: { variant: 'success', label: 'Bajarilgan' },
-  cancelled: { variant: 'default', label: 'Bekor qilingan' },
-};
+> {
+  return {
+    pending: { variant: 'warning', label: t('status.pending') },
+    approved: { variant: 'info', label: t('status.approved') },
+    fulfilled: { variant: 'success', label: t('status.fulfilled') },
+    cancelled: { variant: 'default', label: t('status.cancelled') },
+  };
+}
 
-function ReservationStatusBadge({ status }: { status: string }) {
+function ReservationStatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   const meta =
-    reservationStatusMeta[status] ?? { variant: 'default' as BadgeVariant, label: status };
+    getReservationStatusMeta(t)[status] ?? { variant: 'default' as BadgeVariant, label: status };
   return <Badge variant={meta.variant} size="sm">{meta.label}</Badge>;
 }
 
-function BookTable({ rows }: { rows: BorrowRecord[] }) {
+function BookTable({ rows, t }: { rows: BorrowRecord[]; t: (key: string) => string }) {
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
-            {['Kitob nomi', 'Berildi', 'Qaytarish muddati', 'Qolgan kunlar', 'Holat'].map((col) => (
+            {[t('table.bookTitle'), t('table.issued'), t('table.dueDate'), t('table.daysRemaining'), t('table.status')].map((col) => (
               <th
                 key={col}
                 className="whitespace-nowrap px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400"
@@ -134,7 +143,7 @@ function BookTable({ rows }: { rows: BorrowRecord[] }) {
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">
-                  <BorrowStatusBadge status={borrow.status} />
+                  <BorrowStatusBadge status={borrow.status} t={t} />
                 </td>
               </tr>
             );
@@ -145,13 +154,13 @@ function BookTable({ rows }: { rows: BorrowRecord[] }) {
   );
 }
 
-function ReservationTable({ rows }: { rows: Reservation[] }) {
+function ReservationTable({ rows, t }: { rows: Reservation[]; t: (key: string) => string }) {
   return (
     <div className="w-full overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
-            {['Kitob nomi', 'Bron sanasi', 'Holat'].map((col) => (
+            {[t('table.bookTitle'), t('table.reservationDate'), t('table.status')].map((col) => (
               <th
                 key={col}
                 className="whitespace-nowrap px-4 py-3 text-left font-medium text-slate-600 dark:text-slate-400"
@@ -174,7 +183,7 @@ function ReservationTable({ rows }: { rows: Reservation[] }) {
                 {formatDate(reservation.reservedDate)}
               </td>
               <td className="whitespace-nowrap px-4 py-3">
-                <ReservationStatusBadge status={reservation.status} />
+                <ReservationStatusBadge status={reservation.status} t={t} />
               </td>
             </tr>
           ))}
@@ -189,6 +198,7 @@ export default function StudentProfile() {
   const navigate = useNavigate();
   const { user: currentUser } = useAuth();
   const { users, borrows, reservations, updateUser } = useApp();
+  const { t } = useTranslation();
 
   const student = users.find((u) => u.role === 'student' && u.id === id);
 
@@ -218,14 +228,14 @@ export default function StudentProfile() {
       <div className="animate-fade-in space-y-4">
         <Button variant="outline" onClick={() => navigate('/students')}>
           <ArrowLeft className="h-4 w-4" />
-          O'quvchilar
+          {t('action.back')}
         </Button>
         <Card>
           <EmptyState
             icon={UserX}
-            title="O'quvchi topilmadi"
-            description="Ushbu ID bilan o'quvchi tizimda mavjud emas yoki o'chirilgan."
-            action={{ label: "O'quvchilar ro'yxati", onClick: () => navigate('/students') }}
+            title={t('students.notFound')}
+            description={t('studentProfile.notFoundDesc')}
+            action={{ label: t('students.list'), onClick: () => navigate('/students') }}
           />
         </Card>
       </div>
@@ -242,25 +252,25 @@ export default function StudentProfile() {
 
   const statItems: { label: string; value: number; icon: LucideIcon; iconClass: string }[] = [
     {
-      label: 'Jami kitoblar',
+      label: t('studentProfile.totalBooks'),
       value: studentBorrows.length,
       icon: BookOpen,
       iconClass: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
     },
     {
-      label: 'Hozirgi kitoblar',
+      label: t('studentProfile.currentBooks'),
       value: activeBorrows.length,
       icon: Clock,
       iconClass: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
     },
     {
-      label: 'Kechikkan',
+      label: t('studentProfile.overdueCount'),
       value: overdueBorrows.length,
       icon: AlertTriangle,
       iconClass: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     },
     {
-      label: 'Bronlar',
+      label: t('studentProfile.reservations'),
       value: pendingReservations.length,
       icon: CalendarClock,
       iconClass: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
@@ -282,7 +292,7 @@ export default function StudentProfile() {
     setEditError('');
 
     if (!editFirstName.trim() || !editLastName.trim() || !editEmail.trim()) {
-      setEditError('Ism, familiya va elektron pochta kiritilishi shart');
+      setEditError(t('studentProfile.editError'));
       return;
     }
 
@@ -306,44 +316,44 @@ export default function StudentProfile() {
       activeBorrows.length === 0 ? (
         <EmptyState
           icon={BookOpen}
-          title="Aktiv kitoblar yo'q"
-          description="Bu o'quvchida hozircha aktiv qarzlar mavjud emas."
+          title={t('studentProfile.noCurrentBooks')}
+          description={t('studentProfile.noCurrentBooksDesc')}
         />
       ) : (
-        <BookTable rows={activeBorrows} />
+        <BookTable rows={activeBorrows} t={t} />
       );
   } else if (activeTab === 'history') {
     tabContent =
       returnedBorrows.length === 0 ? (
         <EmptyState
           icon={Clock}
-          title="Tarix bo'sh"
-          description="Bu o'quvchi hali hech qanday kitobni qaytarmagan."
+          title={t('studentProfile.historyEmpty')}
+          description={t('studentProfile.historyEmptyDesc')}
         />
       ) : (
-        <BookTable rows={returnedBorrows} />
+        <BookTable rows={returnedBorrows} t={t} />
       );
   } else if (activeTab === 'reservations') {
     tabContent =
       studentReservations.length === 0 ? (
         <EmptyState
           icon={CalendarClock}
-          title="Bronlar yo'q"
-          description="Bu o'quvchi uchun hozircha hech qanday bron mavjud emas."
+          title={t('studentProfile.reservationsEmpty')}
+          description={t('studentProfile.reservationsEmptyDesc')}
         />
       ) : (
-        <ReservationTable rows={studentReservations} />
+        <ReservationTable rows={studentReservations} t={t} />
       );
   } else {
     tabContent =
       overdueBorrows.length === 0 ? (
         <EmptyState
           icon={AlertTriangle}
-          title="Kechikkan kitoblar yo'q"
-          description="Barcha aktiv qarzlar o'z vaqtida qaytarilmoqda."
+          title={t('studentProfile.overdueEmpty')}
+          description={t('studentProfile.overdueEmptyDesc')}
         />
       ) : (
-        <BookTable rows={overdueBorrows} />
+        <BookTable rows={overdueBorrows} t={t} />
       );
   }
 
@@ -351,7 +361,7 @@ export default function StudentProfile() {
     <div className="animate-fade-in space-y-6">
       <Button variant="outline" onClick={() => navigate('/students')}>
         <ArrowLeft className="h-4 w-4" />
-        O'quvchilar
+        {t('action.back')}
       </Button>
 
       <Card className="p-6">
@@ -375,7 +385,7 @@ export default function StudentProfile() {
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
                 <span className="inline-flex items-center gap-1.5">
                   <GraduationCap className="h-4 w-4" />
-                  {student.grade}-sinf
+                  {t('studentProfile.grade').replace('{grade}', String(student.grade))}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Mail className="h-4 w-4" />
@@ -396,7 +406,7 @@ export default function StudentProfile() {
               <QrCode className="h-5 w-5 shrink-0 text-slate-400 dark:text-slate-500" />
               <QRCodeSVG value={student.qrCode ?? ''} size={56} fgColor="#2563eb" />
               <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">O'quvchi ID</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{t('studentProfile.userId')}</p>
                 <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
                   {student.qrCode}
                 </p>
@@ -405,7 +415,7 @@ export default function StudentProfile() {
             {isAdmin && (
               <Button variant="outline" onClick={openEdit}>
                 <PenLine className="h-4 w-4" />
-                Tahrirlash
+                {t('studentProfile.edit')}
               </Button>
             )}
           </div>
@@ -437,7 +447,7 @@ export default function StudentProfile() {
 
       <div className="animate-fade-in">
         <div className="mb-4 flex flex-wrap gap-1.5 rounded-xl border border-slate-200 bg-slate-50 p-1.5 dark:border-slate-700 dark:bg-slate-800/50">
-          {tabs.map((tab) => (
+          {getTabs(t).map((tab) => (
             <button
               key={tab.key}
               type="button"
@@ -458,13 +468,13 @@ export default function StudentProfile() {
       <Modal
         isOpen={editOpen}
         onClose={() => setEditOpen(false)}
-        title={`${student.firstName} ${student.lastName} — ma'lumotlarni tahrirlash`}
+        title={`${student.firstName} ${student.lastName} — ${t('studentProfile.editTitle')}`}
       >
         <form onSubmit={handleEdit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Ism
+                {t('studentProfile.firstName')}
               </label>
               <input
                 value={editFirstName}
@@ -475,7 +485,7 @@ export default function StudentProfile() {
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Familiya
+                {t('studentProfile.lastName')}
               </label>
               <input
                 value={editLastName}
@@ -488,7 +498,7 @@ export default function StudentProfile() {
 
           <div>
             <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Elektron pochta
+              {t('studentProfile.emailLabel')}
             </label>
             <input
               type="email"
@@ -502,17 +512,17 @@ export default function StudentProfile() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Sinf
+                {t('studentProfile.gradeLabel')}
               </label>
               <Select
                 value={editGrade}
                 onChange={(e) => setEditGrade(e.target.value)}
-                options={gradeOptions}
+                options={getGradeOptions(t)}
               />
             </div>
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Telefon
+                {t('studentProfile.phone')}
               </label>
               <input
                 type="tel"
@@ -531,10 +541,10 @@ export default function StudentProfile() {
 
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" type="button" onClick={() => setEditOpen(false)}>
-              Bekor qilish
+              {t('action.cancel')}
             </Button>
             <Button type="submit" loading={editLoading}>
-              Saqlash
+              {t('action.save')}
             </Button>
           </div>
         </form>

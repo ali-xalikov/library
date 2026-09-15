@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -46,6 +47,7 @@ export default function BookDetail() {
   const { books, addReservation, deleteBook, settings, ratings, rateBook } = useApp();
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   const [reserveOpen, setReserveOpen] = useState(false);
   const [qrOpen, setQrOpen] = useState(false);
@@ -60,9 +62,9 @@ export default function BookDetail() {
         <Card className="max-w-md mx-auto mt-16">
           <EmptyState
             icon={BookX}
-            title="Kitob topilmadi"
-            description="So'ralgan kitob topilmadi yoki o'chirilgan bo'lishi mumkin."
-            action={{ label: 'Kitoblarga qaytish', onClick: () => navigate('/books') }}
+            title={t('bookDetail.notFound')}
+            description={t('bookDetail.notFoundDesc')}
+            action={{ label: t('bookDetail.backToBooks'), onClick: () => navigate('/books') }}
           />
         </Card>
       </div>
@@ -99,19 +101,19 @@ export default function BookDetail() {
   };
 
   const details: { label: string; value: string }[] = [
-    { label: 'Fan', value: `${getSubjectIcon(book.subject)} ${book.subject}` },
-    { label: 'Sinf', value: book.grade.join(', ') },
-    { label: 'Til', value: book.language },
-    { label: 'Nashriyot', value: book.publisher },
-    { label: 'Nashr yili', value: String(book.publishYear) },
-    { label: 'ISBN', value: book.isbn },
-    { label: 'Sahifalar', value: String(book.pages) },
+    { label: t('bookDetail.subject'), value: `${getSubjectIcon(book.subject)} ${book.subject}` },
+    { label: t('bookDetail.grade'), value: book.grade.join(', ') },
+    { label: t('bookDetail.language'), value: book.language },
+    { label: t('bookDetail.publisher'), value: book.publisher },
+    { label: t('bookDetail.publishYear'), value: String(book.publishYear) },
+    { label: t('bookDetail.isbn'), value: book.isbn },
+    { label: t('bookDetail.pages'), value: String(book.pages) },
     {
-      label: 'Mavjud nusxalar',
+      label: t('bookDetail.availableCopies'),
       value: `${book.availableCopies} / ${book.totalCopies}`,
     },
-    { label: 'Raf', value: book.shelfNumber },
-    { label: 'Inventar raqami', value: book.inventoryNumber },
+    { label: t('bookDetail.shelf'), value: book.shelfNumber },
+    { label: t('bookDetail.inventoryNumber'), value: book.inventoryNumber },
   ];
 
   const canReserve = book.status !== 'available' && settings.allowReservation;
@@ -124,7 +126,7 @@ export default function BookDetail() {
           className="inline-flex items-center gap-2 self-start rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
         >
           <ArrowLeft className="h-4 w-4" />
-          Kitoblarga qaytish
+          {t('bookDetail.backToBooks')}
         </Link>
         {isStaff && (
           <div className="flex items-center gap-2">
@@ -134,11 +136,11 @@ export default function BookDetail() {
               onClick={() => navigate(`/books/${book.id}/edit`)}
             >
               <Pencil className="h-4 w-4" />
-              Tahrirlash
+              {t('bookDetail.edit')}
             </Button>
             <Button variant="danger" size="sm" onClick={() => setDeleteOpen(true)}>
               <Trash2 className="h-4 w-4" />
-              O'chirish
+              {t('bookDetail.delete')}
             </Button>
           </div>
         )}
@@ -158,7 +160,7 @@ export default function BookDetail() {
 
           <Card className="mt-4 flex flex-col items-center">
             <p className="mb-3 text-sm font-medium text-slate-600 dark:text-slate-400">
-              Kitobning QR kodi
+              {t('bookDetail.qrCode')}
             </p>
             <div className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700">
               <QRCodeSVG value={book.inventoryNumber} size={160} level="M" />
@@ -184,19 +186,19 @@ export default function BookDetail() {
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
                 <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                  Reyting
+                  {t('bookDetail.rating')}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   {bookRatings.length === 0
-                    ? "Hali baholanmagan"
-                    : `${bookRatings.length} ta o'quvchi baholadi`}
+                    ? t('bookDetail.notRatedYet')
+                    : `${bookRatings.length} ${t('bookDetail.ratingCount')}`}
                 </p>
               </div>
               {user?.role === 'student' ? (
                 <div className="flex flex-col items-start gap-1 sm:items-end">
                   <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-500 dark:text-slate-400">
-                      {myRating ? 'Sizning bahoingiz:' : 'Baholash:'}
+                      {myRating ? t('bookDetail.yourRating') : t('bookDetail.rate')}
                     </span>
                     <StarRating
                       value={myRating?.score ?? 0}
@@ -206,7 +208,7 @@ export default function BookDetail() {
                   </div>
                   {bookRatings.length > 0 && (
                     <span className="text-xs text-slate-400 dark:text-slate-500">
-                      O'rtacha: {avgRating.toFixed(1)} ({bookRatings.length} ta baho)
+                      {t('bookDetail.avg')} {avgRating.toFixed(1)} ({bookRatings.length} {t('bookDetail.ratings')})
                     </span>
                   )}
                 </div>
@@ -227,7 +229,7 @@ export default function BookDetail() {
           {book.description && (
             <Card className="mt-6">
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Tavsif
+                {t('bookDetail.description')}
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
                 {book.description}
@@ -238,7 +240,7 @@ export default function BookDetail() {
           <div className="mt-6 flex flex-wrap gap-3">
             {book.status === 'available' ? (
               <Button variant="primary" disabled>
-                Mavjud
+                {t('bookDetail.available')}
               </Button>
             ) : (
               <Button
@@ -246,7 +248,7 @@ export default function BookDetail() {
                 disabled={!canReserve}
                 onClick={() => setReserveOpen(true)}
               >
-                Bron qilish
+                {t('bookDetail.reserve')}
               </Button>
             )}
 
@@ -258,7 +260,7 @@ export default function BookDetail() {
                 className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600"
               >
                 <ExternalLink className="h-4 w-4" />
-                Online o'qish
+                {t('bookDetail.readOnline')}
               </a>
             )}
 
@@ -272,7 +274,7 @@ export default function BookDetail() {
                 variant="success"
                 onClick={() => navigate(`/issue-book?book=${book.id}`)}
               >
-                Kitobni olish
+                {t('bookDetail.issueBook')}
               </Button>
             )}
           </div>
@@ -282,22 +284,21 @@ export default function BookDetail() {
       <Modal
         isOpen={reserveOpen}
         onClose={() => setReserveOpen(false)}
-        title="Kitobni bron qilish"
+        title={t('bookDetail.reserveTitle')}
       >
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          Siz{' '}
+          {t('bookDetail.reserveDesc1')}{' '}
           <span className="font-semibold text-slate-900 dark:text-white">
             &quot;{book.title}&quot;
           </span>{' '}
-          kitobini bron qilmoqchisiz. Bron tasdiqlangan holda kitob siz uchun
-          saqlanadi.
+          {t('bookDetail.reserveDesc2')}
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setReserveOpen(false)}>
-            Bekor qilish
+            {t('bookDetail.cancel')}
           </Button>
           <Button variant="primary" onClick={handleReserve}>
-            Tasdiqlash
+            {t('bookDetail.confirm')}
           </Button>
         </div>
       </Modal>
@@ -324,7 +325,7 @@ export default function BookDetail() {
       <Modal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        title="Kitobni o'chirish"
+        title={t('bookDetail.deleteTitle')}
         size="sm"
       >
         <p className="text-sm text-slate-600 dark:text-slate-300">
@@ -333,10 +334,10 @@ export default function BookDetail() {
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="ghost" onClick={() => setDeleteOpen(false)}>
-            Bekor qilish
+            {t('bookDetail.cancel')}
           </Button>
           <Button variant="danger" onClick={handleDelete}>
-            O'chirish
+            {t('bookDetail.delete')}
           </Button>
         </div>
       </Modal>

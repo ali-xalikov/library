@@ -11,6 +11,7 @@ import Modal from '../components/ui/Modal';
 import SearchInput from '../components/ui/SearchInput';
 import EmptyState from '../components/ui/EmptyState';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const inputClass =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-400/20 transition-colors';
@@ -29,6 +30,7 @@ export default function Categories() {
   const { books, categories, addCategory, updateCategory, deleteCategory } = useApp();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [search, setSearch] = useState('');
   const [addOpen, setAddOpen] = useState(false);
@@ -70,7 +72,7 @@ export default function Categories() {
   const handleAddSubmit = (e: FormEvent) => {
     e.preventDefault();
     addCategory(form.name.trim(), form.description.trim());
-    showToast('Kategoriya qo\'shildi', 'success');
+    showToast(t('categories.added'), 'success');
     setAddOpen(false);
     setForm(emptyForm);
   };
@@ -82,7 +84,7 @@ export default function Categories() {
       name: form.name.trim(),
       description: form.description.trim(),
     });
-    showToast('Kategoriya yangilandi', 'success');
+    showToast(t('categories.updated'), 'success');
     setEditOpen(false);
     setEditingCategory(null);
   };
@@ -90,7 +92,7 @@ export default function Categories() {
   const handleDelete = () => {
     if (!deleteTarget) return;
     deleteCategory(deleteTarget.id);
-    showToast("Kategoriya o'chirildi", 'success');
+    showToast(t('categories.deleted'), 'success');
     setDeleteTarget(null);
   };
 
@@ -98,21 +100,21 @@ export default function Categories() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Kategoriyalar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('categories.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Kitob kategoriyalarini boshqaring
+            {t('categories.subtitle')}
           </p>
         </div>
         <Button size="sm" onClick={openAdd}>
           <Plus className="h-4 w-4" />
-          Yangi kategoriya
+          {t('categories.new')}
         </Button>
       </div>
 
       <SearchInput
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        placeholder="Kategoriya nomi bo'yicha qidirish..."
+        placeholder={t('categories.search')}
         className="animate-fade-in sm:max-w-sm"
       />
 
@@ -120,16 +122,16 @@ export default function Categories() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={LibraryIcon}
-            title={search ? 'Kategoriyalar topilmadi' : "Kategoriyalar yo'q"}
+            title={search ? t('categories.notFound') : t('categories.empty')}
             description={
               search
-                ? "Qidiruv so'roviga mos kategoriyalar mavjud emas."
-                : "Hozircha kutubxonada kategoriyalar mavjud emas. Birinchi kategoriyani qo'shing."
+                ? t('categories.noSearchResults')
+                : t('categories.emptyDesc')
             }
             action={
               search
                 ? undefined
-                : { label: 'Yangi kategoriya', onClick: openAdd }
+                : { label: t('categories.new'), onClick: openAdd }
             }
           />
         </Card>
@@ -144,7 +146,7 @@ export default function Categories() {
                   type="button"
                   onClick={() => navigate(`/books?category=${encodeURIComponent(c.name)}`)}
                   className="group flex min-w-0 flex-1 items-center gap-3 text-left"
-                  title="Kitoblarni ko'rish"
+                  title={t('categories.viewBooks')}
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
                     <LibraryIcon className="h-5 w-5" />
@@ -159,7 +161,7 @@ export default function Categories() {
                       </p>
                     ) : (
                       <p className="mt-0.5 text-sm italic text-slate-400 dark:text-slate-500">
-                        Tavsif mavjud emas
+                        {t('categories.noDescription')}
                       </p>
                     )}
                   </div>
@@ -168,14 +170,14 @@ export default function Categories() {
                   <button
                     onClick={() => openEdit(c)}
                     className="p-2 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:text-primary-400 dark:hover:bg-primary-900/30 transition-colors"
-                    title="Tahrirlash"
+                    title={t('action.edit')}
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setDeleteTarget(c)}
                     className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors"
-                    title="O'chirish"
+                    title={t('action.delete')}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
@@ -188,7 +190,7 @@ export default function Categories() {
                   className="inline-flex items-center rounded-md text-xs font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   <FileText className="mr-1 inline h-3.5 w-3.5" />
-                  {count} kitobni ko'rish
+                  {count}{t('categories.viewBooks')}
                   <ArrowRight className="ml-1 inline h-3.5 w-3.5" />
                 </button>
               </div>

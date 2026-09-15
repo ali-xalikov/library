@@ -14,6 +14,7 @@ import Select from '../components/ui/Select';
 import Pagination from '../components/ui/Pagination';
 import EmptyState from '../components/ui/EmptyState';
 import { formatDate } from '../utils/helpers';
+import { useTranslation } from '../i18n/LanguageContext';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE = 10;
@@ -23,26 +24,21 @@ const inputClass =
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300';
 
-const roleBadge: Record<Role, { variant: 'danger' | 'info' | 'success'; label: string }> = {
-  admin: { variant: 'danger', label: 'Administrator' },
-  librarian: { variant: 'info', label: 'Kutubxonachi' },
-  student: { variant: 'success', label: "O'quvchi" },
+const roleBadge: Record<Role, { variant: 'danger' | 'info' | 'success' }> = {
+  admin: { variant: 'danger' },
+  librarian: { variant: 'info' },
+  student: { variant: 'success' },
 };
 
 const roleOptions = [
-  { value: 'admin', label: 'Administrator' },
-  { value: 'librarian', label: 'Kutubxonachi' },
-  { value: 'student', label: "O'quvchi" },
+  { value: 'admin' },
+  { value: 'librarian' },
+  { value: 'student' },
 ];
 
 type TabKey = 'all' | Role;
 
-const tabs: { key: TabKey; label: string }[] = [
-  { key: 'all', label: 'Barcha' },
-  { key: 'admin', label: 'Adminlar' },
-  { key: 'librarian', label: 'Kutubxonachilar' },
-  { key: 'student', label: "O'quvchilar" },
-];
+const tabs: TabKey[] = ['all', 'admin', 'librarian', 'student'];
 
 interface UserForm {
   firstName: string;
@@ -65,6 +61,9 @@ export default function Users() {
   const { users, borrows, addStudent, updateUser, deleteUser } = useApp();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
+  const tabLabel = (key: TabKey) => (key === 'all' ? t('users.all') : t(`users.${key}s`));
 
   const [tab, setTab] = useState<TabKey>('all');
   const [search, setSearch] = useState('');
@@ -184,34 +183,34 @@ export default function Users() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Foydalanuvchilar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('users.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Tizim foydalanuvchilarini boshqaring
+            {t('users.subtitle')}
           </p>
         </div>
         <Button size="sm" onClick={openAdd}>
           <UserPlus className="h-4 w-4" />
-          Yangi foydalanuvchi
+          {t('users.newUser')}
         </Button>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
         <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
-          {tabs.map((t) => (
+          {tabs.map((tabItem) => (
             <button
-              key={t.key}
+              key={tabItem}
               onClick={() => {
-                setTab(t.key);
+                setTab(tabItem);
                 setPage(1);
               }}
               className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                tab === t.key
+                tab === tabItem
                   ? 'bg-white text-primary-600 shadow-sm dark:bg-slate-700 dark:text-primary-400'
                   : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
               }`}
             >
-              {t.label}
-              <span className="ml-1.5 text-xs opacity-70">({tabCount(t.key)})</span>
+              {tabLabel(tabItem)}
+              <span className="ml-1.5 text-xs opacity-70">({tabCount(tabItem)})</span>
             </button>
           ))}
         </div>
@@ -221,7 +220,7 @@ export default function Users() {
             setSearch(e.target.value);
             setPage(1);
           }}
-          placeholder="Ism yoki email bo'yicha qidirish..."
+          placeholder={t('users.search')}
           className="sm:w-72"
         />
       </div>

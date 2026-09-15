@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Download, History as HistoryIcon, ScrollText } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { useApp } from '../context/AppContext';
 import type { BorrowRecord } from '../types';
 import Button from '../components/ui/Button';
@@ -19,31 +20,22 @@ import { getBorrowStatusColor, getBorrowStatusLabel } from '../utils/status';
 
 const PAGE_SIZE = 15;
 
-const STATUS_OPTIONS = [
-  { value: 'active', label: 'Faol' },
-  { value: 'returned', label: 'Qaytarilgan' },
-  { value: 'overdue', label: "Muddati o'tgan" },
-];
-
-const SORT_OPTIONS = [
-  { value: 'newest', label: 'Eng yangi' },
-  { value: 'oldest', label: 'Eng eski' },
-];
-
 const DATE_INPUT_CLASS =
   'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-400/20 transition-colors';
 
 function BorrowStatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation();
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getBorrowStatusColor(status)}`}
     >
-      {getBorrowStatusLabel(status)}
+      {t(`status.${status}`)}
     </span>
   );
 }
 
 export default function History() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { borrows } = useApp();
 
@@ -56,6 +48,17 @@ export default function History() {
   const [detail, setDetail] = useState<BorrowRecord | null>(null);
 
   const isStaff = user?.role === 'admin' || user?.role === 'librarian';
+
+  const statusOptions = [
+    { value: 'active', label: t('status.active') },
+    { value: 'returned', label: t('status.returned') },
+    { value: 'overdue', label: t('status.overdue') },
+  ];
+
+  const sortOptions = [
+    { value: 'newest', label: t('history.sort.newest') },
+    { value: 'oldest', label: t('history.sort.oldest') },
+  ];
 
   const filtered = useMemo(() => {
     let list = borrows;
@@ -131,16 +134,16 @@ export default function History() {
           </span>
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Kutubxona tarixi
+              {t('history.title')}
             </h1>
             <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-              Berilgan va qaytarilgan kitoblar bo'yicha to'liq tarix
+              {t('history.subtitle')}
             </p>
           </div>
         </div>
         <Button variant="outline" onClick={handleExport}>
           <Download className="h-4 w-4" />
-          CSV export
+          {t('history.export')}
         </Button>
       </div>
 
@@ -149,20 +152,20 @@ export default function History() {
           <p className="text-2xl font-bold text-slate-900 dark:text-white">
             {total}
           </p>
-          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Jami</p>
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{t('history.total')}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {active}
           </p>
-          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">Faol</p>
+          <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">{t('history.active')}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
           <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
             {returned}
           </p>
           <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-            Qaytarilgan
+            {t('history.returned')}
           </p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-800">
@@ -170,7 +173,7 @@ export default function History() {
             {overdue}
           </p>
           <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
-            Kechikkan
+            {t('history.overdue')}
           </p>
         </div>
       </div>
@@ -183,7 +186,7 @@ export default function History() {
               setSearch(e.target.value);
               resetPage();
             }}
-            placeholder="Kitob nomi yoki o'quvchi qidirish..."
+            placeholder={t('history.search')}
           />
         </div>
         <div className="w-full lg:w-36">
@@ -193,13 +196,13 @@ export default function History() {
               setStatus(e.target.value);
               resetPage();
             }}
-            options={STATUS_OPTIONS}
-            placeholder="Holat"
+            options={statusOptions}
+            placeholder={t('history.status')}
           />
         </div>
         <div className="flex items-center gap-1.5">
           <span className="whitespace-nowrap text-xs font-medium text-slate-500 dark:text-slate-400">
-            Dan:
+            {t('history.from')}
           </span>
           <input
             type="date"
@@ -213,7 +216,7 @@ export default function History() {
         </div>
         <div className="flex items-center gap-1.5">
           <span className="whitespace-nowrap text-xs font-medium text-slate-500 dark:text-slate-400">
-            Gacha:
+            {t('history.to')}
           </span>
           <input
             type="date"
@@ -229,7 +232,7 @@ export default function History() {
           <Select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            options={SORT_OPTIONS}
+            options={sortOptions}
           />
         </div>
       </div>
@@ -238,8 +241,8 @@ export default function History() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={ScrollText}
-            title="Tarix topilmadi"
-            description="Qidiruv shartlariga mos qaydlar topilmadi."
+            title={t('history.notFound')}
+            description={t('history.notFoundDesc')}
           />
         </Card>
       ) : (
@@ -249,14 +252,14 @@ export default function History() {
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
                   {[
-                    "O'quvchi",
-                    'Kitob',
-                    'Berildi',
-                    'Qaytarish',
-                    'Qaytarildi',
-                    'Kunlar',
-                    'Holat',
-                    'Kutubxonachi',
+                    t('history.tableHeaders.student'),
+                    t('history.tableHeaders.book'),
+                    t('history.tableHeaders.issued'),
+                    t('history.tableHeaders.due'),
+                    t('history.tableHeaders.returned'),
+                    t('history.tableHeaders.days'),
+                    t('history.tableHeaders.status'),
+                    t('history.tableHeaders.librarian'),
                   ].map((col) => (
                     <th
                       key={col}
@@ -292,7 +295,7 @@ export default function History() {
                     <td className="px-4 py-3 whitespace-nowrap">
                       {b.status === 'returned' ? (
                         <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                          Qaytarildi
+                          {t('history.returned')}
                         </span>
                       ) : (
                         <span
@@ -319,7 +322,7 @@ export default function History() {
           </div>
           <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3 dark:border-slate-700">
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Jami: {filtered.length}
+              {t('history.total')}: {filtered.length}
             </p>
             <Pagination
               currentPage={currentPage}
@@ -333,25 +336,25 @@ export default function History() {
       <Modal
         isOpen={!!detail}
         onClose={() => setDetail(null)}
-        title="Qarz ma'lumotlari"
+        title={t('history.detailTitle')}
       >
         {detail && (
           <div className="divide-y divide-slate-100 text-sm dark:divide-slate-700/50">
             {[
-              { label: "O'quvchi", value: detail.studentName },
-              { label: 'Kitob', value: detail.bookTitle },
-              { label: 'Berildi', value: formatDate(detail.issuedDate) },
+              { label: t('history.tableHeaders.student'), value: detail.studentName },
+              { label: t('history.tableHeaders.book'), value: detail.bookTitle },
+              { label: t('history.tableHeaders.issued'), value: formatDate(detail.issuedDate) },
               {
-                label: 'Qaytarish muddati',
+                label: t('history.tableHeaders.due'),
                 value: formatDate(detail.dueDate),
               },
               {
-                label: 'Qaytarildi',
+                label: t('history.tableHeaders.returned'),
                 value: detail.returnDate
                   ? formatDate(detail.returnDate)
                   : '—',
               },
-              { label: 'Kutubxonachi', value: detail.issuedBy },
+              { label: t('history.tableHeaders.librarian'), value: detail.issuedBy },
             ].map((row) => (
               <div
                 key={row.label}
@@ -366,13 +369,13 @@ export default function History() {
               </div>
             ))}
             <div className="flex items-start justify-between gap-4 py-2.5">
-              <span className="text-slate-500 dark:text-slate-400">Holat</span>
+              <span className="text-slate-500 dark:text-slate-400">{t('history.status')}</span>
               <BorrowStatusBadge status={detail.status} />
             </div>
             {detail.notes && (
               <div className="flex items-start justify-between gap-4 py-2.5">
                 <span className="text-slate-500 dark:text-slate-400">
-                  Eslatma
+                  {t('history.notes')}
                 </span>
                 <span className="text-right font-medium text-slate-900 dark:text-white">
                   {detail.notes}

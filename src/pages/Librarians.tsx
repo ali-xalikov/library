@@ -14,6 +14,7 @@ import type { User } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../components/ui/Toast';
+import { useTranslation } from '../i18n/LanguageContext';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import Badge from '../components/ui/Badge';
@@ -44,6 +45,7 @@ export default function Librarians() {
   const { user } = useAuth();
   const { users, borrows, addStudent, updateUser, deleteUser } = useApp();
   const { showToast } = useToast();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [addOpen, setAddOpen] = useState(false);
@@ -142,14 +144,14 @@ export default function Librarians() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Kutubxonachilar</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('librarians.title')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Kutubxona xodimlarini boshqaring
+            {t('librarians.subtitle')}
           </p>
         </div>
         <Button size="sm" onClick={openAdd}>
           <UserPlus className="h-4 w-4" />
-          Yangi kutubxonachi
+          {t('librarians.new')}
         </Button>
       </div>
 
@@ -161,7 +163,7 @@ export default function Librarians() {
                 {librarians.length}
               </p>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Jami kutubxonachilar
+                {t('librarians.total')}
               </p>
             </div>
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
@@ -176,7 +178,7 @@ export default function Librarians() {
                 {activeLibrarians}
               </p>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Faol (qarzi bor kitoblar bergan)
+                {t('librarians.active')}
               </p>
             </div>
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
@@ -190,9 +192,9 @@ export default function Librarians() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={UsersIcon}
-            title="Kutubxonachilar yo'q"
-            description="Hozircha tizimda kutubxonachi ro'yxatga olinmagan."
-            action={{ label: "Kutubxonachi qo'shish", onClick: openAdd }}
+            title={t('librarians.empty')}
+            description={t('librarians.emptyDesc')}
+            action={{ label: t('librarians.addBtn'), onClick: openAdd }}
           />
         </Card>
       ) : (
@@ -228,7 +230,7 @@ export default function Librarians() {
                     </p>
                     <div className="mt-3">
                       <Badge variant={activeIssues > 0 ? 'warning' : 'default'}>
-                        Faol qarzlar: {activeIssues}
+                        {t('librarians.activeLoans')}{activeIssues}
                       </Badge>
                     </div>
                   </div>
@@ -236,14 +238,14 @@ export default function Librarians() {
                     <button
                       onClick={() => openEdit(lib)}
                       className="p-2 rounded-lg text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:text-primary-400 dark:hover:bg-primary-900/30 transition-colors"
-                      title="Tahrirlash"
+                      title={t('action.edit')}
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setDeleteTarget(lib)}
                       className="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-900/30 transition-colors"
-                      title="O'chirish"
+                      title={t('action.delete')}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -258,13 +260,13 @@ export default function Librarians() {
       <Modal
         isOpen={addOpen}
         onClose={() => setAddOpen(false)}
-        title="Yangi kutubxonachi"
+        title={t('librarians.addTitle')}
         size="md"
       >
         <form onSubmit={handleAddSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className={labelClass}>Ism</label>
+              <label className={labelClass}>{t('users.firstName')}</label>
               <input
                 type="text"
                 required
@@ -274,7 +276,7 @@ export default function Librarians() {
               />
             </div>
             <div>
-              <label className={labelClass}>Familiya</label>
+              <label className={labelClass}>{t('users.lastName')}</label>
               <input
                 type="text"
                 required
@@ -285,7 +287,7 @@ export default function Librarians() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Email</label>
+            <label className={labelClass}>{t('users.email')}</label>
             <input
               type="email"
               required
@@ -295,7 +297,7 @@ export default function Librarians() {
             />
           </div>
           <div>
-            <label className={labelClass}>Telefon</label>
+            <label className={labelClass}>{t('users.phone')}</label>
             <input
               type="text"
               className={inputClass}
@@ -305,9 +307,9 @@ export default function Librarians() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="secondary" onClick={() => setAddOpen(false)}>
-              Bekor qilish
+              {t('action.cancel')}
             </Button>
-            <Button type="submit">Qo'shish</Button>
+            <Button type="submit">{t('action.add')}</Button>
           </div>
         </form>
       </Modal>
@@ -315,13 +317,13 @@ export default function Librarians() {
       <Modal
         isOpen={editOpen}
         onClose={() => setEditOpen(false)}
-        title="Kutubxonachini tahrirlash"
+        title={t('librarians.editTitle')}
         size="md"
       >
         <form onSubmit={handleEditSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className={labelClass}>Ism</label>
+              <label className={labelClass}>{t('users.firstName')}</label>
               <input
                 type="text"
                 required
@@ -331,7 +333,7 @@ export default function Librarians() {
               />
             </div>
             <div>
-              <label className={labelClass}>Familiya</label>
+              <label className={labelClass}>{t('users.lastName')}</label>
               <input
                 type="text"
                 required
@@ -342,7 +344,7 @@ export default function Librarians() {
             </div>
           </div>
           <div>
-            <label className={labelClass}>Email</label>
+            <label className={labelClass}>{t('users.email')}</label>
             <input
               type="email"
               required
@@ -352,7 +354,7 @@ export default function Librarians() {
             />
           </div>
           <div>
-            <label className={labelClass}>Telefon</label>
+            <label className={labelClass}>{t('users.phone')}</label>
             <input
               type="text"
               className={inputClass}
@@ -362,9 +364,9 @@ export default function Librarians() {
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="secondary" onClick={() => setEditOpen(false)}>
-              Bekor qilish
+              {t('action.cancel')}
             </Button>
-            <Button type="submit">Saqlash</Button>
+            <Button type="submit">{t('action.save')}</Button>
           </div>
         </form>
       </Modal>
@@ -372,19 +374,18 @@ export default function Librarians() {
       <Modal
         isOpen={deleteTarget !== null}
         onClose={() => setDeleteTarget(null)}
-        title="Kutubxonachini o'chirish"
+        title={t('librarians.deleteTitle')}
         size="sm"
       >
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          "{deleteTarget?.firstName} {deleteTarget?.lastName}" kutubxonachini o'chirmoqchimisiz? Bu
-          amalni ortga qaytarib bo'lmaydi.
+          "{deleteTarget?.firstName} {deleteTarget?.lastName}"{t('librarians.deleteDesc')}
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="secondary" onClick={() => setDeleteTarget(null)}>
-            Bekor qilish
+            {t('action.cancel')}
           </Button>
           <Button variant="danger" onClick={handleDelete}>
-            O'chirish
+            {t('action.delete')}
           </Button>
         </div>
       </Modal>

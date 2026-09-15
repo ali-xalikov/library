@@ -8,6 +8,7 @@ import Select from '../components/ui/Select';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../components/ui/Toast';
 import type { Grade, Language, Subject } from '../types';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const subjects: Subject[] = [
   'Matematika',
@@ -116,6 +117,7 @@ function Field({
 }
 
 export default function AddBook() {
+  const { t } = useTranslation();
   const { addBook, updateBook, books } = useApp();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -146,11 +148,11 @@ export default function AddBook() {
     if (e.target) e.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      showToast('Faqat rasm fayli tanlang', 'error');
+      showToast(t('misc.imageOnly'), 'error');
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
-      showToast('Rasm 2 MB dan katta bo\'lmasligi kerak', 'error');
+      showToast(t('misc.imageTooBig'), 'error');
       return;
     }
     const reader = new FileReader();
@@ -162,7 +164,7 @@ export default function AddBook() {
 
   const generateCover = (color: string) => {
     if (!form.title.trim() && !form.author.trim()) {
-      showToast("Avval kitob nomini kiritib qo'ying", 'warning');
+      showToast(t('misc.enterTitleFirst'), 'warning');
       setForm((prev) => ({ ...prev, coverImage: buildCoverUrl(color) }));
       return;
     }
@@ -233,7 +235,7 @@ export default function AddBook() {
     const nextErrors = validate();
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) {
-      showToast('Iltimos, formadagi xatolarni to\'g\'rilang', 'error');
+      showToast(t('misc.validationError'), 'error');
       return;
     }
 
@@ -274,7 +276,7 @@ export default function AddBook() {
       }
       navigate('/books');
     } catch {
-      showToast('Kitob saqlanmadi. Qayta urinib ko\'ring.', 'error');
+      showToast(t('misc.saveError'), 'error');
       setSaving(false);
     }
   };
@@ -284,12 +286,12 @@ export default function AddBook() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            {isEdit ? 'Kitobni tahrirlash' : "Yangi kitob qo'shish"}
+            {isEdit ? t('addBook.editTitle') : t('addBook.newTitle')}
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {isEdit
-              ? 'Kitob ma\'lumotlarini yangilang'
-              : 'Kutubxona fondiga yangi kitob qo\'shing'}
+              ? t('addBook.editSubtitle')
+              : t('addBook.newSubtitle')}
           </p>
         </div>
         <Link
@@ -304,7 +306,7 @@ export default function AddBook() {
       <Card>
         <form onSubmit={handleSubmit} className="space-y-5" noValidate>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="Kitob nomi" required error={errors.title}>
+            <Field label={t('addBook.bookName')} required error={errors.title}>
               <input
                 type="text"
                 name="title"
@@ -314,7 +316,7 @@ export default function AddBook() {
                 className={`${inputCls} ${errors.title ? inputErrorCls : ''}`}
               />
             </Field>
-            <Field label="Muallif" required error={errors.author}>
+            <Field label={t('addBook.author')} required error={errors.author}>
               <input
                 type="text"
                 name="author"
@@ -327,17 +329,17 @@ export default function AddBook() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="Fan" required error={errors.subject}>
+            <Field label={t('addBook.subject')} required error={errors.subject}>
               <Select
                 name="subject"
                 value={form.subject}
                 onChange={handleChange}
                 options={subjectOptions}
-                placeholder="Fan tanlang"
+                placeholder={t('addBook.selectSubject')}
                 className={errors.subject ? inputErrorCls : ''}
               />
             </Field>
-            <Field label="Kategoriya">
+            <Field label={t('addBook.category')}>
               <input
                 type="text"
                 name="category"
@@ -350,7 +352,7 @@ export default function AddBook() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="Sinf">
+            <Field label={t('addBook.grade')}>
               <div className="grid grid-cols-6 gap-2 rounded-lg border border-slate-300 bg-slate-50 p-3 dark:border-slate-600 dark:bg-slate-700/40 sm:grid-cols-11">
                 {grades.map((g) => (
                   <label key={g} className="cursor-pointer">
@@ -367,20 +369,20 @@ export default function AddBook() {
                 ))}
               </div>
             </Field>
-            <Field label="Til" required error={errors.language}>
+            <Field label={t('addBook.language')} required error={errors.language}>
               <Select
                 name="language"
                 value={form.language}
                 onChange={handleChange}
                 options={languageOptions}
-                placeholder="Tilni tanlang"
+                placeholder={t('addBook.selectLanguage')}
                 className={errors.language ? inputErrorCls : ''}
               />
             </Field>
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="Nashriyot">
+            <Field label={t('addBook.publisher')}>
               <input
                 type="text"
                 name="publisher"
@@ -390,7 +392,7 @@ export default function AddBook() {
                 className={inputCls}
               />
             </Field>
-            <Field label="Nashr yili" required error={errors.publishYear}>
+            <Field label={t('addBook.year')} required error={errors.publishYear}>
               <input
                 type="number"
                 name="publishYear"
@@ -405,7 +407,7 @@ export default function AddBook() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="ISBN" required error={errors.isbn}>
+            <Field label={t('addBook.isbn')} required error={errors.isbn}>
               <input
                 type="text"
                 name="isbn"
@@ -415,7 +417,7 @@ export default function AddBook() {
                 className={`${inputCls} ${errors.isbn ? inputErrorCls : ''}`}
               />
             </Field>
-            <Field label="Sahifalar soni">
+            <Field label={t('addBook.pages')}>
               <input
                 type="number"
                 name="pages"
@@ -429,7 +431,7 @@ export default function AddBook() {
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <Field label="Jami nusxalar" required error={errors.totalCopies}>
+            <Field label={t('addBook.totalCopies')} required error={errors.totalCopies}>
               <input
                 type="number"
                 name="totalCopies"
@@ -440,7 +442,7 @@ export default function AddBook() {
                 className={`${inputCls} ${errors.totalCopies ? inputErrorCls : ''}`}
               />
             </Field>
-            <Field label="Raf raqami">
+            <Field label={t('addBook.shelfNumber')}>
               <input
                 type="text"
                 name="shelfNumber"
@@ -453,7 +455,7 @@ export default function AddBook() {
           </div>
 
           <div>
-            <Field label="PDF URL">
+            <Field label={t('addBook.pdfUrl')}>
               <input
                 type="url"
                 name="pdfUrl"
@@ -466,13 +468,13 @@ export default function AddBook() {
           </div>
 
           <div>
-            <span className={labelCls}>Muqova</span>
+            <span className={labelCls}>{t('addBook.cover')}</span>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-3">
                 <div>
                   <span className="mb-1.5 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
                     <Wand2 className="h-3.5 w-3.5" />
-                    Avtomatik yaratish — rang tanlang
+                    {t('addBook.autoGenerate')}
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {coverPalette.map((color) => (
@@ -497,14 +499,14 @@ export default function AddBook() {
 
                 <div>
                   <span className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                    Kompyuterdan yuklash
+                    {t('addBook.uploadFromPc')}
                   </span>
                   <label
                     htmlFor="cover-file"
                     className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:border-primary-500 hover:text-primary-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-primary-400 dark:hover:text-primary-400"
                   >
                     <ImagePlus className="h-4 w-4" />
-                    {isUploadedCover ? 'Boshqa rasm tanlash' : 'Rasm tanlash'}
+                    {isUploadedCover ? t('addBook.changeImage') : t('addBook.selectImage')}
                     <input
                       id="cover-file"
                       ref={coverFileRef}
@@ -520,7 +522,7 @@ export default function AddBook() {
                   <div className="flex flex-wrap items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400">
                     <span className="inline-flex items-center gap-1 font-medium">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      Fayldan yuklandi
+                      {t('addBook.uploaded')}
                     </span>
                     <button
                       type="button"
@@ -528,7 +530,7 @@ export default function AddBook() {
                       className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-900/30 dark:hover:text-red-400"
                     >
                       <X className="h-3 w-3" />
-                      Olib tashlash
+                      {t('addBook.remove')}
                     </button>
                   </div>
                 )}
@@ -536,7 +538,7 @@ export default function AddBook() {
 
               <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-700/40">
                 <span className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                  Oldi ko'rinish
+                  {t('addBook.preview')}
                 </span>
                 {form.coverImage.trim() && !coverError ? (
                   <img
@@ -566,7 +568,7 @@ export default function AddBook() {
           </div>
 
           <div className="grid grid-cols-1 gap-5">
-            <Field label="Tavsif">
+            <Field label={t('addBook.description')}>
               <textarea
                 name="description"
                 value={form.description}
@@ -583,10 +585,10 @@ export default function AddBook() {
               to="/books"
               className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
             >
-              Bekor qilish
+              {t('addBook.cancel')}
             </Link>
             <Button type="submit" variant="primary" size="md" loading={saving}>
-              {isEdit ? "O'zgarishlarni saqlash" : "Kitobni qo'shish"}
+              {isEdit ? t('addBook.saveChanges') : t('addBook.addBook')}
             </Button>
           </div>
         </form>

@@ -10,6 +10,7 @@ import {
   UserRound,
 } from 'lucide-react';
 import type { BorrowRecord } from '../types';
+import { useTranslation } from '../i18n/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { formatDate, getDaysRemainingText, getRelativeDays } from '../utils/helpers';
@@ -34,6 +35,7 @@ function isOverdueBorrow(borrow: BorrowRecord): boolean {
 export default function ReturnBook() {
   const { user } = useAuth();
   const { borrows, books, returnBook, settings } = useApp();
+  const { t } = useTranslation();
 
   const [search, setSearch] = useState('');
   const [inventoryInput, setInventoryInput] = useState('');
@@ -79,7 +81,7 @@ export default function ReturnBook() {
   const handleQuickReturn = () => {
     const raw = inventoryInput.trim().toUpperCase();
     if (!raw) {
-      setMessage({ type: 'error', text: 'Inventar raqamini kiriting' });
+      setMessage({ type: 'error', text: t('returnBook.enterInventory') });
       return;
     }
 
@@ -89,7 +91,7 @@ export default function ReturnBook() {
     );
 
     if (!book) {
-      setMessage({ type: 'error', text: 'Bu inventar raqamiga mos kitob topilmadi' });
+      setMessage({ type: 'error', text: t('returnBook.bookNotFoundInventory') });
       return;
     }
 
@@ -97,7 +99,7 @@ export default function ReturnBook() {
     if (!borrow) {
       setMessage({
         type: 'error',
-        text: `"${book.title}" hozirda hech qaysi o'quvchiga berilmagan`,
+        text: `"${book.title}" ${t('returnBook.bookNotIssued')}`,
       });
       return;
     }
@@ -113,9 +115,9 @@ export default function ReturnBook() {
   return (
     <div className="space-y-6">
       <div className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Kitobni qaytarish</h1>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('returnBook.title')}</h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          O'quvchilardan berilgan kitoblarni qabul qilib olish
+          {t('returnBook.subtitle')}
         </p>
       </div>
 
@@ -143,13 +145,13 @@ export default function ReturnBook() {
               <Search className="h-4 w-4" />
             </span>
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              Faol qarzlar qidiruvi
+              {t('returnBook.searchTitle')}
             </h2>
           </div>
           <SearchInput
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="O'quvchi ismi, kitob nomi yoki inventar raqami..."
+            placeholder={t('returnBook.searchPlaceholder')}
           />
         </Card>
 
@@ -160,10 +162,10 @@ export default function ReturnBook() {
             </span>
             <div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Tezkor qaytarish
+                {t('returnBook.quickReturn')}
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Inventar raqamini kiritib (LIB-XXXXXX) kitobni darhol qaytaring
+                {t('returnBook.quickReturnHint')}
               </p>
             </div>
           </div>
@@ -182,7 +184,7 @@ export default function ReturnBook() {
             </div>
             <Button variant="success" onClick={handleQuickReturn}>
               <RotateCcw className="h-4 w-4" />
-              Tezkor qaytarish
+              {t('returnBook.quickReturn')}
             </Button>
           </div>
         </Card>
@@ -192,15 +194,15 @@ export default function ReturnBook() {
         <Card className="animate-fade-in">
           <EmptyState
             icon={BookOpen}
-            title="Faol qarzlar yo'q"
-            description="Hozircha barcha berilgan kitoblar qaytarilgan."
+            title={t('returnBook.noActiveLoans')}
+            description={t('returnBook.noActiveLoansDesc')}
           />
         </Card>
       ) : (
         <div className="space-y-4">
           <div className="flex items-center justify-between animate-fade-in">
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              Faol qarzlar ({filteredBorrows.length})
+              {t('returnBook.activeLoans')} ({filteredBorrows.length})
             </h2>
           </div>
 
@@ -208,8 +210,8 @@ export default function ReturnBook() {
             <Card className="animate-fade-in">
               <EmptyState
                 icon={Search}
-                title="Qidiruv natijasi yo'q"
-                description="Qidiruv shartlariga mos faol qarz topilmadi."
+                title={t('returnBook.searchResults')}
+                description={t('returnBook.searchResultsDesc')}
               />
             </Card>
           ) : (
@@ -258,20 +260,20 @@ export default function ReturnBook() {
                       {overdue && (
                         <Badge variant="danger" size="md">
                           <AlertTriangle className="mr-1 h-3 w-3" />
-                          Muddati o'tgan
+                          {t('returnBook.overdue')}
                         </Badge>
                       )}
                     </div>
 
                     <div className="mt-4 grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-900/40">
                       <div>
-                        <p className="text-xs text-slate-400 dark:text-slate-500">Berildi</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">{t('returnBook.issued')}</p>
                         <p className="font-medium text-slate-700 dark:text-slate-300">
                           {formatDate(borrow.issuedDate)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-400 dark:text-slate-500">Qaytarish muddati</p>
+                        <p className="text-xs text-slate-400 dark:text-slate-500">{t('returnBook.due')}</p>
                         <p className="font-medium text-slate-700 dark:text-slate-300">
                           {formatDate(borrow.dueDate)}
                         </p>
@@ -291,14 +293,14 @@ export default function ReturnBook() {
                         </span>
                         {overdue && fine > 0 && (
                           <p className="mt-0.5 text-xs text-red-500 dark:text-red-400">
-                            Jarima: {overdueDays} kun × {settings.overdueFinePerDay.toLocaleString()} ={' '}
+                            {t('returnBook.fine')} {overdueDays} kun × {settings.overdueFinePerDay.toLocaleString()} ={' '}
                             <span className="font-semibold">{fine.toLocaleString()} so'm</span>
                           </p>
                         )}
                       </div>
                       <Button variant="success" onClick={() => handleReturn(borrow)}>
                         <RotateCcw className="h-4 w-4" />
-                        Qaytarish
+                        {t('returnBook.returnBtn')}
                       </Button>
                     </div>
                   </Card>

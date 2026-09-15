@@ -6,8 +6,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import Pagination from '../components/ui/Pagination';
-import { formatDate, getDaysRemainingText, getRelativeDays } from '../utils/helpers';
+import { formatDate, getRelativeDays } from '../utils/helpers';
 import { getBorrowStatusColor } from '../utils/status';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const PAGE_SIZE = 8;
 
@@ -15,6 +16,7 @@ export default function MyBooks() {
   const { user } = useAuth();
   const { borrows, books } = useApp();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
 
   const activeBorrows = useMemo(() => {
@@ -46,7 +48,7 @@ export default function MyBooks() {
     <div className="animate-fade-in space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Mening kitoblarim</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('page.myBooks')}</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {activeBorrows.length} ta faol kitob, {returnedCount} ta qaytarilgan
           </p>
@@ -58,7 +60,7 @@ export default function MyBooks() {
             </div>
             <div>
               <p className="text-xl font-bold text-slate-900 dark:text-white">{activeBorrows.length}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Faol kitoblar</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('status.active')} kitoblar</p>
             </div>
           </Card>
           <Card className="flex items-center gap-3 !p-4">
@@ -67,7 +69,7 @@ export default function MyBooks() {
             </div>
             <div>
               <p className="text-xl font-bold text-slate-900 dark:text-white">{overdueCount}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Kechikkan</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('history.overdue')}</p>
             </div>
           </Card>
         </div>
@@ -76,9 +78,9 @@ export default function MyBooks() {
       {activeBorrows.length === 0 ? (
         <EmptyState
           icon={BookOpen}
-          title="Hozircha kitob olmagansiz"
-          description="Kutubxonadagi kitoblarni ko'rib chiqing va o'zingizga keraklisini bron qiling."
-          action={{ label: 'Kitoblarni ko\'rish', onClick: () => navigate('/books') }}
+          title={t('dashboard.noBooks')}
+          description={t('dashboard.noBooksDesc')}
+          action={{ label: t('nav.books'), onClick: () => navigate('/books') }}
         />
       ) : (
         <>
@@ -115,7 +117,7 @@ export default function MyBooks() {
                         <span
                           className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${getBorrowStatusColor(isOverdue ? 'overdue' : 'active')}`}
                         >
-                          {isOverdue ? 'Muddati o\'tgan' : 'Faol'}
+                          {isOverdue ? t('status.overdue') : t('status.active')}
                         </span>
                       </div>
                       {book && (
@@ -127,13 +129,13 @@ export default function MyBooks() {
                         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                           <Clock className="h-4 w-4" />
                           <span>
-                            Berildi: <b>{formatDate(borrow.issuedDate)}</b>
+                            {t('dashboard.issueDate')}: <b>{formatDate(borrow.issuedDate)}</b>
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                           <Clock className="h-4 w-4" />
                           <span>
-                            Qaytarish: <b>{formatDate(borrow.dueDate)}</b>
+                            {t('dashboard.dueDate')}: <b>{formatDate(borrow.dueDate)}</b>
                           </span>
                         </div>
                         <p
@@ -145,7 +147,12 @@ export default function MyBooks() {
                                 : 'text-emerald-600 dark:text-emerald-400'
                           }`}
                         >
-                          {getDaysRemainingText(borrow.dueDate)}
+                          {(() => {
+                            const d = getRelativeDays(borrow.dueDate);
+                            if (d === 0) return t('misc.daysRemaining0');
+                            if (d < 0) return `${Math.abs(d)}${t('misc.daysRemainingPast')}`;
+                            return `${d}${t('misc.daysRemainingFuture')}`;
+                          })()}
                         </p>
                       </div>
                     </div>

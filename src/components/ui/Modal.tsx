@@ -12,10 +12,10 @@ interface ModalProps {
 }
 
 const sizeStyles: Record<NonNullable<ModalProps['size']>, string> = {
-  sm: 'max-w-sm',
-  md: 'max-w-md',
-  lg: 'max-w-lg',
-  xl: 'max-w-xl',
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-md',
+  lg: 'sm:max-w-lg',
+  xl: 'sm:max-w-xl',
 };
 
 export default function Modal({
@@ -53,12 +53,17 @@ export default function Modal({
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
     >
       <div
-        className={`relative w-full ${sizeStyles[size]} bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 animate-fade-in`}
+        className={`relative w-full ${sizeStyles[size]} bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 animate-fade-in max-h-[90dvh] flex flex-col`}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+        {/* Drag handle visible on mobile */}
+        <div className="flex justify-center pt-3 sm:hidden">
+          <div className="h-1 w-10 rounded-full bg-slate-300 dark:bg-slate-600" />
+        </div>
+
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
             {title}
           </h2>
@@ -69,7 +74,7 @@ export default function Modal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-5 py-4 overflow-y-auto">{children}</div>
       </div>
     </div>,
     document.body,

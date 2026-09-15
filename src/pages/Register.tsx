@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { Grade } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import Button from '../components/ui/Button';
 
 const inputClass =
@@ -24,6 +25,7 @@ const gradeOptions = Array.from({ length: 11 }, (_, i) => i + 1);
 export default function Register() {
   const { user, register } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -78,7 +80,7 @@ export default function Register() {
         </div>
         <div>
           <p className="text-sm font-bold text-white">Qarshi shahar 23-maktab</p>
-          <p className="text-[11px] text-primary-200">Maktab Kutubxonasi Boshqaruv Tizimi</p>
+          <p className="text-[11px] text-primary-200">{t('app.subtitle')}</p>
         </div>
       </div>
 
@@ -93,13 +95,13 @@ export default function Register() {
             <BookOpen className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-white mb-3">Qarshi shahar 23-maktab</h1>
-          <p className="text-lg text-primary-200 mb-10">Maktab Kutubxonasi Boshqaruv Tizimi</p>
+          <p className="text-lg text-primary-200 mb-10">{t('app.subtitle')}</p>
 
           <div className="space-y-3 text-left">
             {[
-              'Kutubxona vositalaridan foydalaning',
-              'Kitoblarga onlayn bron qiling',
-              'Qarzlaringizni kuzatib boring',
+              t('register.features.1'),
+              t('register.features.2'),
+              t('register.features.3'),
             ].map((feature) => (
               <div
                 key={feature}
@@ -123,17 +125,17 @@ export default function Register() {
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
-            Ro'yxatdan o'tish
+            {t('register.title')}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
-            Hisobingizni yarating va kutubxonaga kirish huquqiga ega bo'ling
+            {t('register.subtitle')}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Ism
+                  {t('register.firstName')}
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -149,7 +151,7 @@ export default function Register() {
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Familiya
+                  {t('register.lastName')}
                 </label>
                 <div className="relative">
                   <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -167,7 +169,7 @@ export default function Register() {
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Elektron pochta
+                {t('register.email')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -184,7 +186,7 @@ export default function Register() {
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Sinf <span className="text-slate-400">(ixtiyoriy)</span>
+                {t('register.grade')}
               </label>
               <div className="relative">
                 <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -193,7 +195,7 @@ export default function Register() {
                   onChange={(e) => setGrade(e.target.value)}
                   className={`${inputClass} appearance-none`}
                 >
-                  <option value="">Sinfni tanlang</option>
+                  <option value="">{t('register.selectGrade')}</option>
                   {gradeOptions.map((g) => (
                     <option key={g} value={g}>
                       {g}-sinf
@@ -205,7 +207,7 @@ export default function Register() {
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Parol
+                {t('register.password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -221,7 +223,7 @@ export default function Register() {
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                  aria-label={showPassword ? 'Parolni yashirish' : 'Parolni ko\'rsatish'}
+                  aria-label={showPassword ? t('misc.passwordHide') : t('misc.passwordShow')}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -230,7 +232,7 @@ export default function Register() {
 
             <div>
               <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                Parolni tasdiqlang
+                {t('register.confirmPassword')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -253,18 +255,18 @@ export default function Register() {
 
             <Button type="submit" size="lg" className="w-full" loading={loading}>
               {!loading && <UserPlus className="h-4 w-4" />}
-              Ro'yxatdan o'tish
+              {t('register.submit')}
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-            Hisobingiz bormi?{' '}
+            {t('register.hasAccount')}{' '}
             <Link
               to="/login"
               className="inline-flex items-center gap-1 font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Tizimga kirish
+              {t('register.login')}
             </Link>
           </p>
         </div>
