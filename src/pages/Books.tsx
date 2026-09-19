@@ -11,6 +11,7 @@ import StatusBadge from '../components/ui/StatusBadge';
 import StarRating from '../components/ui/StarRating';
 import BookCover from '../components/ui/BookCover';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import type { Grade, Subject } from '../types';
 import { filterBooks, getSubjectIcon } from '../utils/helpers';
@@ -47,6 +48,7 @@ const TABLE_PER_PAGE = 15;
 export default function Books() {
   const { t } = useTranslation();
   const { books, ratings } = useApp();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -126,13 +128,15 @@ export default function Books() {
             {t("books.subtitle")}
           </p>
         </div>
-        <Link
-          to="/books/new"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
-        >
-          <Plus className="h-4 w-4" />
-          {t("books.new")}
-        </Link>
+        {(user?.role === 'admin' || user?.role === 'librarian') && (
+          <Link
+            to="/books/new"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+          >
+            <Plus className="h-4 w-4" />
+            {t("books.new")}
+          </Link>
+        )}
       </div>
 
       <Card className="p-4!">
@@ -254,15 +258,14 @@ export default function Books() {
               className="group block transition-transform duration-200 hover:-translate-y-0.5"
             >
               <Card className="h-full p-0! overflow-hidden">
-                {/* Cover - mobil uchun kattaroq */}
-                <div className="relative aspect-[3/4] sm:h-52 sm:aspect-auto overflow-hidden bg-slate-100 dark:bg-slate-700">
+                {/* Cover - mobil va desktopda bir xil kitob nisbatida katta */}
+                <div className="relative overflow-hidden bg-slate-100 dark:bg-slate-700">
                   <BookCover
                     subject={book.subject}
                     title={book.title}
                     author={book.author}
                     coverImage={book.coverImage}
                     size="lg" // md → lg
-                    className="h-full w-full object-cover"
                   />
                   <div className="absolute right-2 top-2 z-10">
                     <StatusBadge status={book.status} />

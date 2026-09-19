@@ -116,22 +116,34 @@ export default function IssueBook() {
 
   const handleConfirm = async () => {
     if (!selectedStudent || !selectedBook) return;
+
+    // Eng so‘nggi holatni statedan olamiz
+    const latestBook = books.find((b) => b.id === selectedBook.id);
+    if (!latestBook) {
+      setError("Kitob topilmadi");
+      return;
+    }
+    if (latestBook.availableCopies < 1) {
+      setError("Bu kitobdan mavjud nusxalar yo'q");
+      return;
+    }
+
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     const result = await issueBook(
-      selectedBook,
+      latestBook, // ← eski selectedBook o‘rniga
       selectedStudent,
-      `${currentUser?.firstName ?? ''} ${currentUser?.lastName ?? ''}`.trim()
+      `${currentUser?.firstName ?? ""} ${currentUser?.lastName ?? ""}`.trim()
     );
 
     setLoading(false);
 
     if (result.success) {
       setSuccess(result.message);
-      setStudentSearch('');
-      setBookSearch('');
+      setStudentSearch("");
+      setBookSearch("");
       setSelectedStudent(null);
       setSelectedBook(null);
       setStep(1);
@@ -139,7 +151,6 @@ export default function IssueBook() {
       setError(result.message);
     }
   };
-
   return (
     <div className="space-y-6">
       <div className="animate-fade-in">

@@ -101,7 +101,9 @@ export default function Reservations() {
     const book = books.find((b) => b.id === reservation.bookId);
     const student = users.find((u) => u.id === reservation.studentId);
     if (!book || !student) return;
-    const result = await issueBook(book, student, staffName);
+    // Nusxa tasdiqlashda allaqachon ajratilgan (5/5 → 4/5), shuning uchun
+    // bu yerda availableCopies yana kamaytirilmaydi.
+    const result = await issueBook(book, student, staffName, true);
     if (!result.success) {
       showToast(result.message, 'error');
       return;

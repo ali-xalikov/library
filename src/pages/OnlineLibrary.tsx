@@ -20,6 +20,10 @@ import BookCover from '../components/ui/BookCover';
 
 const PLACEHOLDER_PDF = '/pdfs/placeholder.pdf';
 
+function isLocalPdf(url: string | undefined | null): boolean {
+  return !!url && (url.startsWith('http') || url.startsWith('/pdf/'));
+}
+
 const SUBJECT_OPTIONS = [
   { value: 'Matematika', label: 'Matematika' },
   { value: 'Informatika', label: 'Informatika' },
@@ -62,7 +66,9 @@ function OnlineLibraryGrid() {
   const [grade, setGrade] = useState('');
 
   const onlineBooks = useMemo(() => {
-    const realOnline = books.filter((b) => b.pdfUrl);
+    // Faqat haqiqiy PDF manzili bo'lgan kitoblar (http yoki /pdf/).
+    // Placeholder '/pdfs/placeholder.pdf' e'lon qilinmaydi.
+    const realOnline = books.filter((b) => b.pdfUrl && isLocalPdf(b.pdfUrl));
     if (realOnline.length > 0) {
       return realOnline;
     }
@@ -191,7 +197,7 @@ function OnlineReaderContent({ bookId }: { bookId?: string }) {
   const { books } = useApp();
   const navigate = useNavigate();
   const book = books.find((b) => b.id === bookId);
-  const isRealPdf = !!book?.pdfUrl?.startsWith('http');
+  const isRealPdf = isLocalPdf(book?.pdfUrl);
 
   if (!book) {
     return (
@@ -220,7 +226,7 @@ function OnlineReaderContent({ bookId }: { bookId?: string }) {
 
       <div className="animate-fade-in rounded-xl border border-slate-200 bg-white px-6 py-5 dark:border-slate-700 dark:bg-slate-800">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          {book.coverImage.startsWith('http') ? (
+          {(book.coverImage ?? '').startsWith('http') ? (
             <img
               src={book.coverImage}
               alt={book.title}

@@ -116,7 +116,7 @@ export default function BookDetail() {
     { label: t('bookDetail.inventoryNumber'), value: book.inventoryNumber },
   ];
 
-  const canReserve = book.status !== 'available' && settings.allowReservation;
+  const canReserve = settings.allowReservation;
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -238,17 +238,18 @@ export default function BookDetail() {
           )}
 
           <div className="mt-6 flex flex-wrap gap-3">
-            {book.status === 'available' ? (
-              <Button variant="primary" disabled>
-                {t('bookDetail.available')}
-              </Button>
-            ) : (
+            {canReserve ? (
               <Button
                 variant="primary"
-                disabled={!canReserve}
                 onClick={() => setReserveOpen(true)}
               >
                 {t('bookDetail.reserve')}
+              </Button>
+            ) : (
+              <Button variant="primary" disabled>
+                {book.status === 'available'
+                  ? t('bookDetail.available')
+                  : t('bookDetail.reserve')}
               </Button>
             )}
 

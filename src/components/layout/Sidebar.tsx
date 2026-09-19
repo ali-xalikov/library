@@ -19,7 +19,6 @@ import {
   Tags,
   UserCog,
   Users,
-  MessagesSquare,
   X,
 } from 'lucide-react';
 import type { Role, User } from '../../types';
@@ -46,7 +45,7 @@ const COMMON_ITEMS: NavItem[] = [
   { labelKey: 'nav.dashboard', path: '/', icon: LayoutDashboard },
   { labelKey: 'nav.books', path: '/books', icon: BookOpen },
   { labelKey: 'nav.onlineLibrary', path: '/online-library', icon: Monitor },
-  { labelKey: 'nav.chat', path: '/chat', icon: MessagesSquare },
+
 ];
 
 const STUDENT_ITEMS: NavItem[] = [

@@ -306,7 +306,7 @@ export default function Librarians() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="secondary" onClick={() => setAddOpen(false)}>
+            <Button type="button" variant="secondary" onClick={() => setAddOpen(false)}>
               {t('action.cancel')}
             </Button>
             <Button type="submit">{t('action.add')}</Button>
@@ -363,7 +363,7 @@ export default function Librarians() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="secondary" onClick={() => setEditOpen(false)}>
+            <Button type="button" variant="secondary" onClick={() => setEditOpen(false)}>
               {t('action.cancel')}
             </Button>
             <Button type="submit">{t('action.save')}</Button>

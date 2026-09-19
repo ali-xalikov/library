@@ -18,18 +18,20 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
     );
 
   if (compact) {
+    const languages = ['uz', 'en', 'ru'] as const;
+    const next = languages[(languages.indexOf(language) + 1) % languages.length];
     return (
       <button
         type="button"
-        onClick={() => setLanguage(language === 'uz' ? 'en' : 'uz')}
+        onClick={() => setLanguage(next)}
         title={t('navbar.language')}
         aria-label={t('navbar.language')}
         className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
       >
         <Languages className="h-5 w-5" />
-        <span className="sr-only">{language === 'uz' ? 'EN' : 'UZ'}</span>
+        <span className="sr-only">{next.toUpperCase()}</span>
         <span className="ml-0.5 hidden text-xs font-bold lg:inline">
-          {language === 'uz' ? 'EN' : 'UZ'}
+          {next.toUpperCase()}
         </span>
       </button>
     );
@@ -43,6 +45,13 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
         className={buttonClass(language === 'uz')}
       >
         {t('navbar.uz')}
+      </button>
+      <button
+        type="button"
+        onClick={() => setLanguage('ru')}
+        className={buttonClass(language === 'ru')}
+      >
+        {t('navbar.ru')}
       </button>
       <button
         type="button"

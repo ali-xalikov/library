@@ -5,15 +5,15 @@ import {
   ChevronDown,
   LogOut,
   Menu,
-  Moon,
   Settings,
-  Sun,
   User as UserIcon,
 } from "lucide-react";
 import type { Role, User } from "../../types";
 import { classNames } from "../../utils/helpers";
 import { useTranslation } from "../../i18n/LanguageContext";
+import { useApp } from "../../context/AppContext";
 import LanguageSwitcher from "../ui/LanguageSwitcher";
+import ThemeToggle from "../ui/ThemeToggle";
 
 interface NavbarProps {
   onSidebarToggle: () => void;
@@ -34,6 +34,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/books": "page.books",
   "/books/new": "page.books",
   "/online-library": "page.onlineLibrary",
+
   "/my-books": "page.myBooks",
   "/profile": "page.profile",
   "/reservations": "page.reservations",
@@ -82,6 +83,15 @@ export default function Navbar({
 }: NavbarProps) {
   const location = useLocation();
   const { t } = useTranslation();
+  const { notifications } = useApp();
+
+  const unreadCount = (() => {
+    const list =
+      user.role === "admin"
+        ? notifications
+        : notifications.filter((n) => n.userId === user.id);
+    return list.filter((n) => !n.read).length;
+  })();
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     const stored = window.localStorage.getItem("theme");
@@ -136,25 +146,29 @@ export default function Navbar({
         {/* Language switcher */}
         <LanguageSwitcher compact />
 
-        {/* Dark mode toggle */}
-        <button
-          type="button"
-          onClick={() => setIsDark((prev) => !prev)}
+        {/* Dark/light mode switch */}
+        <ThemeToggle
+          checked={isDark}
+          onChange={setIsDark}
           title={isDark ? t("navbar.yorug") : t("navbar.qorongu")}
           aria-label={isDark ? t("navbar.yorug") : t("navbar.qorongu")}
-          className={ICON_BUTTON_CLASS}
-        >
-          {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-        </button>
+        />
 
-        {/* Notifications - badge olib tashlandi */}
+        {/* Notifications - o'qilmaganlar soni badge bilan ko'rsatiladi */}
         <Link
           to="/notifications"
           title={t("page.notifications")}
           aria-label={t("page.notifications")}
           className={ICON_BUTTON_CLASS}
         >
-          <Bell className="h-5 w-5" />
+          <span className="relative">
+            <Bell className="h-5 w-5" />
+            {unreadCount > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold leading-none text-white">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
+          </span>
         </Link>
 
         {/* User menu */}

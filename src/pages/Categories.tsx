@@ -230,7 +230,7 @@ export default function Categories() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="secondary" onClick={() => setAddOpen(false)}>
+            <Button type="button" variant="secondary" onClick={() => setAddOpen(false)}>
               Bekor qilish
             </Button>
             <Button type="submit">Qo'shish</Button>
@@ -266,7 +266,7 @@ export default function Categories() {
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="secondary" onClick={() => setEditOpen(false)}>
+            <Button type="button" variant="secondary" onClick={() => setEditOpen(false)}>
               Bekor qilish
             </Button>
             <Button type="submit">Saqlash</Button>

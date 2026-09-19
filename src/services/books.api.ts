@@ -10,6 +10,11 @@ export async function getBooks(): Promise<Book[]> {
   return toStrIds(res ?? []);
 }
 
+export async function getBook(id: string): Promise<Book> {
+  const res = await api<BookItem>(`/books/${id}`);
+  return toStrId(res);
+}
+
 export async function createBook(data: BookInput): Promise<Book> {
   const res = await api<BookItem>('/books', {
     method: 'POST',

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import {
@@ -17,10 +17,53 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import Button from '../components/ui/Button';
 
-const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-11 pr-10 text-sm text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-primary-400 dark:focus:ring-primary-400/20 transition-colors';
+/* ------------------------------------------------------------------ */
+/*  Konstantalar                                                       */
+/* ------------------------------------------------------------------ */
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD = 8;
 
 const gradeOptions = Array.from({ length: 11 }, (_, i) => i + 1);
+
+/* ------------------------------------------------------------------ */
+/*  Validatsiya                                                        */
+/* ------------------------------------------------------------------ */
+
+function validateFirstName(v: string) {
+  if (!v.trim()) return 'Ism kiritilishi shart';
+  if (v.trim().length < 2) return 'Kamida 2 ta belgi';
+  return '';
+}
+
+function validateLastName(v: string) {
+  if (!v.trim()) return 'Familiya kiritilishi shart';
+  if (v.trim().length < 2) return 'Kamida 2 ta belgi';
+  return '';
+}
+
+function validateEmail(v: string) {
+  const val = v.trim();
+  if (!val) return 'Email kiritilishi shart';
+  if (!EMAIL_RE.test(val)) return 'Email formati noto\'g\'ri';
+  return '';
+}
+
+function validatePassword(v: string) {
+  if (!v) return 'Parol kiritilishi shart';
+  if (v.length < MIN_PASSWORD) return `Kamida ${MIN_PASSWORD} ta belgi bo'lishi kerak`;
+  return '';
+}
+
+function validateConfirm(v: string, password: string) {
+  if (!v) return 'Parolni qayta kiriting';
+  if (v !== password) return 'Parollar mos kelmadi';
+  return '';
+}
+
+/* ------------------------------------------------------------------ */
+/*  Komponent                                                          */
+/* ------------------------------------------------------------------ */
 
 export default function Register() {
   const { user, register } = useAuth();
@@ -30,29 +73,60 @@ export default function Register() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [grade, setGrade] = useState<string>('');
+  const [grade, setGrade] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState('');
 
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
+  const [touched, setTouched] = useState({
+    firstName: false,
+    lastName: false,
+    email: false,
+    password: false,
+    confirmPassword: false,
+  });
+
+  const mark = useCallback(
+    (field: keyof typeof touched) => setTouched((p) => ({ ...p, [field]: true })),
+    [],
+  );
+
+  const errs = useMemo(
+    () => ({
+      firstName: touched.firstName ? validateFirstName(firstName) : '',
+      lastName: touched.lastName ? validateLastName(lastName) : '',
+      email: touched.email ? validateEmail(email) : '',
+      password: touched.password ? validatePassword(password) : '',
+      confirmPassword: touched.confirmPassword
+        ? validateConfirm(confirmPassword, password)
+        : '',
+    }),
+    [firstName, lastName, email, password, confirmPassword, touched],
+  );
+
+  const isValid =
+    !validateFirstName(firstName) &&
+    !validateLastName(lastName) &&
+    !validateEmail(email) &&
+    !validatePassword(password) &&
+    !validateConfirm(confirmPassword, password);
+
+  if (user) return <Navigate to="/" replace />;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setServerError('');
+    setTouched({
+      firstName: true,
+      lastName: true,
+      email: true,
+      password: true,
+      confirmPassword: true,
+    });
 
-    if (password.length < 8) {
-      setError('Parol kamida 8 ta belgidan iborat bo\'lishi kerak');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Parollar bir-biriga mos kelmadi');
-      return;
-    }
+    if (!isValid) return;
 
     setLoading(true);
     const result = await register({
@@ -64,16 +138,18 @@ export default function Register() {
     });
     setLoading(false);
 
-    if (result.success) {
-      navigate('/', { replace: true });
-    } else {
-      setError(result.message);
-    }
+    if (result.success) navigate('/', { replace: true });
+    else setServerError(result.message);
   };
+
+  const inputBase =
+    'w-full rounded-lg border bg-white py-2.5 pl-11 pr-10 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500';
+  const inputNormal = `${inputBase} border-slate-300 focus:border-primary-500 focus:ring-primary-500/20 dark:border-slate-600 dark:focus:border-primary-400 dark:focus:ring-primary-400/20`;
+  const inputError = `${inputBase} border-red-400 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500/20`;
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
-      {/* Mobile branding header */}
+      {/* Mobil sarlavha */}
       <div className="lg:hidden fixed top-0 inset-x-0 z-10 bg-gradient-to-r from-slate-800 to-primary-800 px-6 py-4 flex items-center gap-3">
         <div className="h-10 w-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
           <BookOpen className="h-5 w-5 text-primary-300" />
@@ -84,7 +160,7 @@ export default function Register() {
         </div>
       </div>
 
-      {/* Branding side */}
+      {/* Branding (desktop) */}
       <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-gradient-to-br from-slate-800 via-primary-800 to-primary-900 items-center justify-center p-12">
         <div className="absolute -top-24 -right-24 h-80 w-80 rounded-full bg-primary-500/20 blur-3xl" />
         <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-slate-500/20 blur-3xl" />
@@ -98,24 +174,22 @@ export default function Register() {
           <p className="text-lg text-primary-200 mb-10">{t('app.subtitle')}</p>
 
           <div className="space-y-3 text-left">
-            {[
-              t('register.features.1'),
-              t('register.features.2'),
-              t('register.features.3'),
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 backdrop-blur-sm"
-              >
-                <span className="h-2 w-2 shrink-0 rounded-full bg-primary-300" />
-                <span className="text-sm text-primary-100">{feature}</span>
-              </div>
-            ))}
+            {[t('register.features.1'), t('register.features.2'), t('register.features.3')].map(
+              (feature) => (
+                <div
+                  key={feature}
+                  className="flex items-center gap-3 rounded-xl bg-white/5 px-4 py-3 ring-1 ring-white/10 backdrop-blur-sm"
+                >
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-primary-300" />
+                  <span className="text-sm text-primary-100">{feature}</span>
+                </div>
+              ),
+            )}
           </div>
         </div>
       </div>
 
-      {/* Form side */}
+      {/* Forma */}
       <div className="flex-1 flex items-center justify-center px-6 py-24 lg:py-12">
         <div className="w-full max-w-md animate-fade-in">
           <div className="lg:hidden mb-8 text-center">
@@ -143,11 +217,14 @@ export default function Register() {
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
+                    onBlur={() => mark('firstName')}
                     placeholder="Aziz"
-                    className={inputClass}
-                    required
+                    className={errs.firstName ? inputError : inputNormal}
                   />
                 </div>
+                {errs.firstName && (
+                  <p className="mt-1.5 text-xs text-red-500 dark:text-red-400">{errs.firstName}</p>
+                )}
               </div>
               <div>
                 <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -159,11 +236,14 @@ export default function Register() {
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
+                    onBlur={() => mark('lastName')}
                     placeholder="Rahimov"
-                    className={inputClass}
-                    required
+                    className={errs.lastName ? inputError : inputNormal}
                   />
                 </div>
+                {errs.lastName && (
+                  <p className="mt-1.5 text-xs text-red-500 dark:text-red-400">{errs.lastName}</p>
+                )}
               </div>
             </div>
 
@@ -177,11 +257,14 @@ export default function Register() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onBlur={() => mark('email')}
                   placeholder="aziz@student.school.uz"
-                  className={inputClass}
-                  required
+                  className={errs.email ? inputError : inputNormal}
                 />
               </div>
+              {errs.email && (
+                <p className="mt-1.5 text-xs text-red-500 dark:text-red-400">{errs.email}</p>
+              )}
             </div>
 
             <div>
@@ -193,7 +276,7 @@ export default function Register() {
                 <select
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
-                  className={`${inputClass} appearance-none`}
+                  className={`${inputNormal} appearance-none`}
                 >
                   <option value="">{t('register.selectGrade')}</option>
                   {gradeOptions.map((g) => (
@@ -215,19 +298,22 @@ export default function Register() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onBlur={() => mark('password')}
                   placeholder="Kamida 8 ta belgi"
-                  className={inputClass}
-                  required
+                  className={errs.password ? inputError : inputNormal}
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
+                  onClick={() => setShowPassword((p) => !p)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                   aria-label={showPassword ? t('misc.passwordHide') : t('misc.passwordShow')}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {errs.password && (
+                <p className="mt-1.5 text-xs text-red-500 dark:text-red-400">{errs.password}</p>
+              )}
             </div>
 
             <div>
@@ -240,16 +326,21 @@ export default function Register() {
                   type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  onBlur={() => mark('confirmPassword')}
                   placeholder="Parolni qayta kiriting"
-                  className={inputClass}
-                  required
+                  className={errs.confirmPassword ? inputError : inputNormal}
                 />
               </div>
+              {errs.confirmPassword && (
+                <p className="mt-1.5 text-xs text-red-500 dark:text-red-400">
+                  {errs.confirmPassword}
+                </p>
+              )}
             </div>
 
-            {error && (
+            {serverError && (
               <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
-                {error}
+                {serverError}
               </div>
             )}
 

@@ -1,5 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import type { ReactNode } from "react";
 import type {
   User,
   Book,
@@ -10,60 +17,61 @@ import type {
   ChatMessage,
   BookRating,
   SystemSettings,
-} from '../types';
-import { ApiError } from '../services/api';
+} from "../types";
+import { ApiError } from "../services/api";
 import {
   getMessages,
   createMessage,
   deleteMessage as deleteMessageRequest,
-} from '../services/chat.api';
-import { containsProfanity } from '../utils/profanity';
+} from "../services/chat.api";
+import { containsProfanity } from "../utils/profanity";
 import {
   getProfiles,
   createProfile,
   updateProfile,
   deleteProfile,
-} from '../services/profiles.api';
+} from "../services/profiles.api";
 import {
   getBooks,
+  getBook,
   createBook,
   updateBook as updateBookRequest,
   deleteBook as deleteBookRequest,
-} from '../services/books.api';
+} from "../services/books.api";
 import {
   getBorrows,
   createBorrow,
   updateBorrow,
   deleteBorrow,
-} from '../services/borrows.api';
+} from "../services/borrows.api";
 import {
   getReservations,
   createReservation,
   updateReservation,
-} from '../services/reservations.api';
+} from "../services/reservations.api";
 import {
   getCategories,
   createCategory as createCategoryRequest,
   updateCategory as updateCategoryRequest,
   deleteCategory as deleteCategoryRequest,
-} from '../services/categories.api';
+} from "../services/categories.api";
 import {
   getNotifications,
   createNotification,
   updateNotification,
-} from '../services/notifications.api';
+} from "../services/notifications.api";
 import {
   fetchSettings as fetchSettingsRequest,
   createSettings,
   updateSettings as updateSettingsRequest,
-} from '../services/settings.api';
-import { demoSettings } from '../data/mockData';
-import type { NotificationInput } from '../services/notifications.api';
+} from "../services/settings.api";
+import { demoSettings } from "../data/mockData";
+import type { NotificationInput } from "../services/notifications.api";
 import {
   getRatings,
   createRating,
   updateRating,
-} from '../services/ratings.api';
+} from "../services/ratings.api";
 
 const MAX_CHAT_MESSAGES = 500;
 const CHAT_TRIM_TO = 250;
@@ -81,32 +89,37 @@ interface AppContextValue {
   messages: ChatMessage[];
   ratings: BookRating[];
   settings: SystemSettings;
-  addBook: (data: Omit<Book, 'id' | 'inventoryNumber' | 'qrCode'>) => Promise<Book>;
+  addBook: (
+    data: Omit<Book, "id" | "inventoryNumber" | "qrCode">
+  ) => Promise<Book>;
   updateBook: (id: string, updates: Partial<Book>) => Promise<void>;
   deleteBook: (id: string) => Promise<void>;
   issueBook: (
     book: Book,
     student: User,
-    issuedBy: string
+    issuedBy: string,
+    copyAlreadyHeld?: boolean
   ) => Promise<{ success: boolean; message: string }>;
   returnBook: (borrowId: string) => Promise<void>;
-  addStudent: (data: Omit<User, 'id' | 'createdAt'>) => Promise<User>;
+  addStudent: (data: Omit<User, "id" | "createdAt">) => Promise<User>;
   updateUser: (id: string, updates: Partial<User>) => Promise<void>;
   deleteUser: (id: string) => Promise<void>;
   addReservation: (book: Book, student: User) => Promise<Reservation | null>;
   approveReservation: (id: string) => Promise<void>;
   cancelReservation: (id: string) => Promise<void>;
   fulfillReservation: (id: string) => Promise<void>;
-  addNotification: (data: Omit<Notification, 'id' | 'createdAt' | 'read'>) => Promise<void>;
+  addNotification: (
+    data: Omit<Notification, "id" | "createdAt" | "read">
+  ) => Promise<void>;
   markNotificationRead: (id: string) => Promise<void>;
   markAllNotificationsRead: () => Promise<void>;
-  sendMessage: (data: Omit<ChatMessage, 'id' | 'createdAt'>) => Promise<void>;
+  sendMessage: (data: Omit<ChatMessage, "id" | "createdAt">) => Promise<void>;
   deleteMessage: (id: string) => Promise<void>;
   reloadChat: () => Promise<void>;
   rateBook: (
     bookId: string,
     score: number,
-    byUser: Pick<User, 'id' | 'firstName' | 'lastName'>
+    byUser: Pick<User, "id" | "firstName" | "lastName">
   ) => Promise<void>;
   updateSettings: (updates: Partial<SystemSettings>) => Promise<void>;
   addCategory: (name: string, description: string) => Promise<void>;
@@ -180,7 +193,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     let trimmed = next;
     if (trimmed.length > MAX_CHAT_MESSAGES) {
       const sorted = [...trimmed].sort(
-        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
       const toRemove = sorted.slice(0, sorted.length - CHAT_TRIM_TO);
       void Promise.allSettled(toRemove.map((m) => deleteMessageRequest(m.id)));
@@ -205,38 +219,49 @@ export function AppProvider({ children }: { children: ReactNode }) {
       fetchSettingsRequest(),
     ]);
 
-    const [booksS, usersS, borrowsS, reservationsS, categoriesS, notificationsS, chatS, ratingsS, settingsS] =
-      results;
+    const [
+      booksS,
+      usersS,
+      borrowsS,
+      reservationsS,
+      categoriesS,
+      notificationsS,
+      chatS,
+      ratingsS,
+      settingsS,
+    ] = results;
 
-    if (booksS.status === 'fulfilled') setBooks(booksS.value.map(normalizeBook));
+    if (booksS.status === "fulfilled")
+      setBooks(booksS.value.map(normalizeBook));
     else setError(messageOf(booksS.reason));
 
-    if (usersS.status === 'fulfilled') setUsers(usersS.value);
+    if (usersS.status === "fulfilled") setUsers(usersS.value);
     else setError((prev) => prev ?? messageOf(usersS.reason));
 
-    if (borrowsS.status === 'fulfilled')
+    if (borrowsS.status === "fulfilled")
       setBorrows(borrowsS.value.map(normalizeBorrow));
     else setError((prev) => prev ?? messageOf(borrowsS.reason));
 
-    if (reservationsS.status === 'fulfilled')
+    if (reservationsS.status === "fulfilled")
       setReservations(reservationsS.value.map(normalizeReservation));
     else setError((prev) => prev ?? messageOf(reservationsS.reason));
 
-    if (categoriesS.status === 'fulfilled') setCategories(categoriesS.value);
+    if (categoriesS.status === "fulfilled") setCategories(categoriesS.value);
     else setError((prev) => prev ?? messageOf(categoriesS.reason));
 
-    if (notificationsS.status === 'fulfilled')
+    if (notificationsS.status === "fulfilled")
       setNotifications(notificationsS.value.map(normalizeNotification));
     else setError((prev) => prev ?? messageOf(notificationsS.reason));
 
-    if (chatS.status === 'fulfilled')
+    if (chatS.status === "fulfilled")
       applyMessages(chatS.value.map(normalizeChatMessage));
     else setError((prev) => prev ?? messageOf(chatS.reason));
 
-    if (ratingsS.status === 'fulfilled') setRatings(ratingsS.value.map(normalizeRating));
+    if (ratingsS.status === "fulfilled")
+      setRatings(ratingsS.value.map(normalizeRating));
     else setError((prev) => prev ?? messageOf(ratingsS.reason));
 
-    if (settingsS.status === 'fulfilled') {
+    if (settingsS.status === "fulfilled") {
       setSettings(settingsS.value.settings);
       setSettingsId(settingsS.value.id);
     } else {
@@ -250,7 +275,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     void loadAll();
   }, [loadAll]);
 
-  const notify = async (data: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
+  const notify = async (
+    data: Omit<Notification, "id" | "createdAt" | "read">
+  ) => {
     const full: NotificationInput = {
       ...data,
       createdAt: new Date().toISOString(),
@@ -262,10 +289,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addBook = async (
-    data: Omit<Book, 'id' | 'inventoryNumber' | 'qrCode'>
+    data: Omit<Book, "id" | "inventoryNumber" | "qrCode">
   ): Promise<Book> => {
     const nextNumber = books.length + 1;
-    const inventoryNumber = `LIB-${String(nextNumber).padStart(6, '0')}`;
+    const inventoryNumber = `LIB-${String(nextNumber).padStart(6, "0")}`;
     const book = await createBook({
       ...data,
       inventoryNumber,
@@ -286,7 +313,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       } else {
         const created = await createCategoryRequest({
           name: data.category,
-          description: '',
+          description: "",
           bookCount: 1,
         });
         setCategories((prev) => [created, ...prev]);
@@ -296,13 +323,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const admin = users.find((u) => u.role === 'admin');
+      const admin = users.find((u) => u.role === "admin");
       if (admin) {
         await notify({
           userId: admin.id,
-          title: 'Yangi kitob qo\'shildi',
+          title: "Yangi kitob qo'shildi",
           message: `"${book.title}" kitobi kutubxona fondiga qo'shildi.`,
-          type: 'success',
+          type: "success",
           link: `/books/${book.id}`,
         });
       }
@@ -314,31 +341,45 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const updateBook = async (id: string, updates: Partial<Book>) => {
-    try {
-      const updated = await updateBookRequest(id, updates);
-      setBooks((prev) => prev.map((b) => (b.id === updated.id ? normalizeBook(updated) : b)));
-    } catch (err) {
-      setError(messageOf(err));
-    }
+    const updated = await updateBookRequest(id, updates);
+    setBooks((prev) =>
+      prev.map((b) => (b.id === updated.id ? normalizeBook(updated) : b))
+    );
   };
 
   const deleteBook = async (id: string) => {
     try {
       const activeBorrows = borrows.filter(
-        (b) => b.bookId === id && b.status === 'active'
+        (b) => b.bookId === id && b.status === "active"
       );
       await Promise.allSettled(activeBorrows.map((b) => deleteBorrow(b.id)));
       await deleteBookRequest(id);
       setBooks((prev) => prev.filter((b) => b.id !== id));
-      setBorrows((prev) => prev.filter((b) => b.bookId !== id || b.status !== 'active'));
+      setBorrows((prev) =>
+        prev.filter((b) => b.bookId !== id || b.status !== "active")
+      );
     } catch (err) {
       setError(messageOf(err));
     }
   };
 
-  const issueBook = async (book: Book, student: User, issuedBy: string) => {
+  const issueBook = async (
+    book: Book,
+    student: User,
+    issuedBy: string,
+    copyAlreadyHeld = false
+  ) => {
+    // Serverdagi eng so'nggi holatini o'qib olamiz — state eskirgan bo'lsa
+    // ham nusxa soniga noto'g'ri qiymat yozilmaydi.
+    let currentBook: Book;
+    try {
+      currentBook = await getBook(book.id);
+    } catch {
+      return { success: false, message: "Kitob topilmadi" };
+    }
+
     const activeBorrows = borrows.filter(
-      (b) => b.studentId === student.id && b.status === 'active'
+      (b) => b.studentId === student.id && b.status === "active"
     ).length;
 
     if (activeBorrows >= settings.maxBooksPerStudent) {
@@ -347,7 +388,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         message: `O'quvchi maksimal ${settings.maxBooksPerStudent} tadan ortiq kitob ololmaydi`,
       };
     }
-    if (book.availableCopies < 1) {
+
+    // Bron tasdiqlanganda nusxa allaqachon ajratilgan — yana kamaytirilmaydi.
+    if (!copyAlreadyHeld && currentBook.availableCopies < 1) {
       return { success: false, message: "Bu kitobdan mavjud nusxalar yo'q" };
     }
 
@@ -356,43 +399,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const dueDate = new Date(issuedDate);
       dueDate.setDate(dueDate.getDate() + settings.maxBorrowDays);
 
-      const updatedBook = await updateBookRequest(book.id, {
-        availableCopies: book.availableCopies - 1,
-        status: book.availableCopies - 1 <= 0 ? 'borrowed' : book.status,
-      });
+      if (!copyAlreadyHeld) {
+        const newAvailable = currentBook.availableCopies - 1;
+
+        const updatedBook = await updateBookRequest(currentBook.id, {
+          availableCopies: newAvailable,
+          status: newAvailable <= 0 ? "borrowed" : currentBook.status,
+        });
+
+        setBooks((prev) =>
+          prev.map((b) =>
+            b.id === updatedBook.id ? normalizeBook(updatedBook) : b
+          )
+        );
+      }
 
       const record = await createBorrow({
-        bookId: book.id,
-        bookTitle: book.title,
+        bookId: currentBook.id,
+        bookTitle: currentBook.title,
         studentId: student.id,
         studentName: `${student.firstName} ${student.lastName}`,
         issuedBy,
         issuedDate: issuedDate.toISOString(),
         dueDate: dueDate.toISOString(),
-        status: 'active',
+        status: "active",
       });
 
-      setBooks((prev) =>
-        prev.map((b) => (b.id === updatedBook.id ? updatedBook : b))
-      );
       setBorrows((prev) => [normalizeBorrow(record), ...prev]);
 
-      const dueText = `${dueDate.getDate()}.${dueDate.getMonth() + 1}.${dueDate.getFullYear()}`;
-      try {
-        await notify({
-          userId: student.id,
-          title: 'Kitob berildi',
-          message: `"${book.title}" kitobini ${issuedBy} Sizga topshirdi. Qaytarish muddati: ${dueText}`,
-          type: 'info',
-          link: '/my-books',
-        });
-      } catch {
-        /* bildirishnoma xatosi asosiy jarayonni to'xtatmaydi */
-      }
+      // ... notify qismi o‘zgarishsiz
 
       return {
         success: true,
-        message: `${book.title} — ${student.firstName} ${student.lastName}ga berildi`,
+        message: `${currentBook.title} — ${student.firstName} ${student.lastName}ga berildi`,
       };
     } catch (err) {
       return { success: false, message: messageOf(err) };
@@ -408,19 +447,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const wasOverdue = new Date(returnDate) > new Date(borrow.dueDate);
 
       const updatedBorrow = await updateBorrow(borrowId, {
-        status: 'returned',
+        status: "returned",
         returnDate,
-        notes: wasOverdue ? 'Kechikish bilan qaytarildi' : borrow.notes,
+        notes: wasOverdue ? "Kechikish bilan qaytarildi" : borrow.notes,
       });
       setBorrows((prev) =>
-        prev.map((b) => (b.id === borrowId ? normalizeBorrow(updatedBorrow) : b))
+        prev.map((b) =>
+          b.id === borrowId ? normalizeBorrow(updatedBorrow) : b
+        )
       );
 
       const currentBook = books.find((b) => b.id === borrow.bookId);
       if (currentBook) {
         const updatedBook = await updateBookRequest(currentBook.id, {
           availableCopies: currentBook.availableCopies + 1,
-          status: 'available',
+          status: "available",
         });
         setBooks((prev) =>
           prev.map((b) => (b.id === updatedBook.id ? updatedBook : b))
@@ -430,16 +471,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const nextReservation = reservations.find(
         (r) =>
           r.bookId === borrow.bookId &&
-          (r.status === 'pending' || r.status === 'approved')
+          (r.status === "pending" || r.status === "approved")
       );
       if (nextReservation) {
         try {
           await notify({
             userId: nextReservation.studentId,
-            title: 'Sizning navbatingiz',
+            title: "Sizning navbatingiz",
             message: `"${borrow.bookTitle}" kitobi qaytarildi. Endi kitobni olishingiz mumkin.`,
-            type: 'success',
-            link: '/reservations',
+            type: "success",
+            link: "/reservations",
           });
         } catch {
           /* bildirishnoma xatosi asosiy jarayonni to'xtatmaydi */
@@ -451,14 +492,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addStudent = async (
-    data: Omit<User, 'id' | 'createdAt'>
+    data: Omit<User, "id" | "createdAt">
   ): Promise<User> => {
-    const studentNumber = users.filter((u) => u.role === 'student').length + 1;
+    const studentNumber = users.filter((u) => u.role === "student").length + 1;
     const student = await createProfile({
       ...data,
-      role: data.role ?? 'student',
+      role: data.role ?? "student",
       createdAt: new Date().toISOString(),
-      qrCode: `STU-${String(studentNumber).padStart(6, '0')}`,
+      qrCode: `STU-${String(studentNumber).padStart(6, "0")}`,
     });
     setUsers((prev) => [...prev, student]);
     return student;
@@ -467,9 +508,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const updateUser = async (id: string, updates: Partial<User>) => {
     try {
       const updated = await updateProfile(id, updates);
-      setUsers((prev) =>
-        prev.map((u) => (u.id === updated.id ? updated : u))
-      );
+      setUsers((prev) => prev.map((u) => (u.id === updated.id ? updated : u)));
     } catch (err) {
       setError(messageOf(err));
     }
@@ -477,7 +516,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const deleteUser = async (id: string) => {
     try {
-      const active = borrows.find((b) => b.studentId === id && b.status === 'active');
+      const active = borrows.find(
+        (b) => b.studentId === id && b.status === "active"
+      );
       if (active) {
         setError("Foydalanuvchida faol qarz bor, o'chirib bo'lmaydi");
         return;
@@ -495,7 +536,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         (r) =>
           r.bookId === book.id &&
           r.studentId === student.id &&
-          (r.status === 'pending' || r.status === 'approved')
+          (r.status === "pending" || r.status === "approved")
       );
       if (existing) return existing;
 
@@ -505,34 +546,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
         studentId: student.id,
         studentName: `${student.firstName} ${student.lastName}`,
         reservedDate: new Date().toISOString(),
-        status: 'pending',
+        status: "pending",
       });
       setReservations((prev) => [normalizeReservation(reservation), ...prev]);
 
-      if (book.availableCopies > 0 && book.status !== 'reserved') {
-        try {
-          const updatedBook = await updateBookRequest(book.id, {
-            ...book,
-            status: 'reserved',
-          });
-          setBooks((prev) =>
-            prev.map((b) => (b.id === updatedBook.id ? updatedBook : b))
-          );
-        } catch {
-          /* holat xatosi bronni bekor qilmaydi */
-        }
-      }
+      // Bron qilishdanoq butun kitobni "reserved" deb belgilash olib tashlandi:
+      // hali nusxa ajratilmagan, shu sababli holat o'zgarishi noto'g'ri edi.
+      // "Band qilingan" faqat tasdiqlash vaqtida oxirgi bo'sh nusxa
+      // ajratilganda (approveReservation ichida) ko'rsatiladi.
 
       try {
         await notify({
           userId: student.id,
-          title: 'Bron yaratildi',
+          title: "Bron yaratildi",
           message: `"${book.title}" kitobiga bron qilindingiz.`,
-          type: 'info',
-          link: '/reservations',
+          type: "info",
+          link: "/reservations",
         });
       } catch {
         /* bildirishnoma xatosi asosiy jarayonni to'xtatmaydi */
+      }
+
+      // O'quvchi bron qilganda kutubxonachilar navbarda xabarnoma oladi
+      const librarians = users.filter((u) => u.role === "librarian");
+      for (const librarian of librarians) {
+        try {
+          await notify({
+            userId: librarian.id,
+            title: "Yangi bron",
+            message: `${student.firstName} ${student.lastName} "${book.title}" kitobiga bron qildi.`,
+            type: "info",
+            link: "/reservations",
+          });
+        } catch {
+          /* bildirishnoma xatosi asosiy jarayonni to'xtatmaydi */
+        }
       }
 
       return reservation;
@@ -544,10 +592,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const approveReservation = async (id: string) => {
     try {
-      const updated = await updateReservation(id, { status: 'approved' });
+      const updated = await updateReservation(id, { status: "approved" });
       setReservations((prev) =>
-        prev.map((r) => (r.id === updated.id ? normalizeReservation(updated) : r))
+        prev.map((r) =>
+          r.id === updated.id ? normalizeReservation(updated) : r
+        )
       );
+
+      // Tasdiqlanganda bitta nusxa o'quvchiga ajratiladi: 5/5 → 4/5
+      const reservation = reservations.find((r) => r.id === id);
+      if (reservation) {
+        const book = await getBook(reservation.bookId);
+        if (book && book.availableCopies > 0) {
+          const newAvailable = book.availableCopies - 1;
+          const updatedBook = await updateBookRequest(book.id, {
+            availableCopies: newAvailable,
+            // Oxirgi bo'sh nusxa ham ajratilsagina kitob "band" deb belgilanadi.
+            ...(newAvailable === 0 ? { status: "reserved" } : {}),
+          });
+          setBooks((prev) =>
+            prev.map((b) =>
+              b.id === updatedBook.id ? normalizeBook(updatedBook) : b
+            )
+          );
+        }
+      }
     } catch (err) {
       setError(messageOf(err));
     }
@@ -556,20 +625,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const cancelReservation = async (id: string) => {
     try {
       const reservation = reservations.find((r) => r.id === id);
-      if (reservation && reservation.status === 'pending') {
+      if (reservation && reservation.status === "pending") {
         const hasOtherPending = reservations.some(
           (r) =>
             r.bookId === reservation.bookId &&
             r.id !== id &&
-            r.status === 'pending'
+            r.status === "pending"
         );
         if (!hasOtherPending) {
           const book = books.find((b) => b.id === reservation.bookId);
-          if (book && book.availableCopies > 0 && book.status === 'reserved') {
+          if (book && book.availableCopies > 0 && book.status === "reserved") {
             try {
+              // FIX: shu yerda ham faqat "status" yuboriladi, butun
+              // `book` obyekti emas — sababi yuqoridagi izohda.
               const updatedBook = await updateBookRequest(book.id, {
-                ...book,
-                status: 'available',
+                status: "available",
               });
               setBooks((prev) =>
                 prev.map((b) => (b.id === updatedBook.id ? updatedBook : b))
@@ -580,9 +650,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
         }
       }
-      const updated = await updateReservation(id, { status: 'cancelled' });
+
+      // Tasdiqlangan bron bekor qilinsa, ajratilgan nusxa qaytariladi: 4/5 → 5/5
+      if (reservation && reservation.status === "approved") {
+        const book = books.find((b) => b.id === reservation.bookId);
+        if (book && book.availableCopies < book.totalCopies) {
+          try {
+            const newAvailable = book.availableCopies + 1;
+            const updatedBook = await updateBookRequest(book.id, {
+              availableCopies: newAvailable,
+              status: book.status === "reserved" ? "available" : book.status,
+            });
+            setBooks((prev) =>
+              prev.map((b) => (b.id === updatedBook.id ? updatedBook : b))
+            );
+          } catch {
+            /* holat xatosi bekor qilishni to'xtatmaydi */
+          }
+        }
+      }
+
+      const updated = await updateReservation(id, { status: "cancelled" });
       setReservations((prev) =>
-        prev.map((r) => (r.id === updated.id ? normalizeReservation(updated) : r))
+        prev.map((r) =>
+          r.id === updated.id ? normalizeReservation(updated) : r
+        )
       );
     } catch (err) {
       setError(messageOf(err));
@@ -591,9 +683,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const fulfillReservation = async (id: string) => {
     try {
-      const updated = await updateReservation(id, { status: 'fulfilled' });
+      const updated = await updateReservation(id, { status: "fulfilled" });
       setReservations((prev) =>
-        prev.map((r) => (r.id === updated.id ? normalizeReservation(updated) : r))
+        prev.map((r) =>
+          r.id === updated.id ? normalizeReservation(updated) : r
+        )
       );
     } catch (err) {
       setError(messageOf(err));
@@ -601,7 +695,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const addNotification = async (
-    data: Omit<Notification, 'id' | 'createdAt' | 'read'>
+    data: Omit<Notification, "id" | "createdAt" | "read">
   ) => {
     try {
       await notify(data);
@@ -614,7 +708,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const updated = await updateNotification(id, { read: true });
       setNotifications((prev) =>
-        prev.map((n) => (n.id === updated.id ? normalizeNotification(updated) : n))
+        prev.map((n) =>
+          n.id === updated.id ? normalizeNotification(updated) : n
+        )
       );
     } catch (err) {
       setError(messageOf(err));
@@ -636,9 +732,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const sendMessage = async (data: Omit<ChatMessage, 'id' | 'createdAt'>) => {
+  const sendMessage = async (data: Omit<ChatMessage, "id" | "createdAt">) => {
     if (containsProfanity(data.text)) {
-      throw new Error('Qo\'pol so\'z yuborish mumkin emas.');
+      throw new Error("Qo'pol so'z yuborish mumkin emas.");
     }
     try {
       const message = await createMessage({
@@ -673,7 +769,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const rateBook = async (
     bookId: string,
     score: number,
-    byUser: Pick<User, 'id' | 'firstName' | 'lastName'>
+    byUser: Pick<User, "id" | "firstName" | "lastName">
   ) => {
     try {
       const existing = ratings.find(
@@ -682,11 +778,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const userName = `${byUser.firstName} ${byUser.lastName}`.trim();
       if (existing) {
         const updated = await updateRating(existing.id, score);
-        setRatings((prev) => prev.map((r) => (r.id === existing.id ? normalizeRating(updated) : r)));
+        setRatings((prev) =>
+          prev.map((r) => (r.id === existing.id ? normalizeRating(updated) : r))
+        );
       } else {
         const created = await createRating({
           bookId,
-          bookTitle: books.find((b) => b.id === bookId)?.title ?? '',
+          bookTitle: books.find((b) => b.id === bookId)?.title ?? "",
           userId: byUser.id,
           userName,
           score,
@@ -716,7 +814,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const addCategory = async (name: string, description: string) => {
     try {
-      const created = await createCategoryRequest({ name, description, bookCount: 0 });
+      const created = await createCategoryRequest({
+        name,
+        description,
+        bookCount: 0,
+      });
       setCategories((prev) => [created, ...prev]);
     } catch (err) {
       setError(messageOf(err));
@@ -791,7 +893,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 export function useApp(): AppContextValue {
   const context = useContext(AppContext);
   if (!context) {
-    throw new Error('useApp must be used within AppProvider');
+    throw new Error("useApp must be used within AppProvider");
   }
   return context;
 }

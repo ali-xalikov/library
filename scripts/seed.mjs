@@ -94,7 +94,19 @@ const COVER_COLORS = {
   'bolalik': '#7e22ce',
 };
 
-const EBOOK_KEYS = ['kichkina-shahzoda', 'english-grammar', 'python-asoslari', 'bolalik'];
+const EBOOK_KEYS = [
+  'otkan-kunlar', 'mehrobdan-chayon', 'kichkina-shahzoda',
+  'english-grammar', 'python-asoslari', 'bolalik', 'yolgizlik',
+];
+
+// PDF fayllar xaritasi: books_id_key → public/pdf/ fayl nomi
+const PDF_MAP = {
+  'otkan-kunlar': '/pdf/utgan_kunlar.pdf',
+  'mehrobdan-chayon': '/pdf/mehrobdan_chayon.pdf',
+  'kichkina-shahzoda': '/pdf/kichkina_shahzoda.pdf',
+  'english-grammar': '/pdf/essential_english_words_1.pdf',
+  'yolgizlik': '/pdf/yolgizlik.pdf',
+};
 
 function coverUrl(title, author, color) {
   const text = `${encodeURIComponent(title)}%0A%0A${encodeURIComponent(author)}`;
@@ -113,7 +125,7 @@ const books = [
     publisher: 'Sharq',
     publishYear: 2019,
     isbn: '978-9943-24-455-8',
-    pages: 512,
+    pages: 220,
     totalCopies: 5,
     availableCopies: 4,
     shelfNumber: 'AB-01',
@@ -130,7 +142,7 @@ const books = [
     publisher: 'Sharq',
     publishYear: 2018,
     isbn: '978-9943-24-456-5',
-    pages: 480,
+    pages: 290,
     totalCopies: 3,
     availableCopies: 3,
     shelfNumber: 'AB-02',
@@ -147,7 +159,7 @@ const books = [
     publisher: 'Yangi asr avlodi',
     publishYear: 2020,
     isbn: '978-9943-20-123-5',
-    pages: 128,
+    pages: 92,
     totalCopies: 8,
     availableCopies: 6,
     shelfNumber: 'AB-03',
@@ -266,7 +278,7 @@ const books = [
     publisher: 'Cambridge University Press',
     publishYear: 2015,
     isbn: '978-0-521-67543-7',
-    pages: 380,
+    pages: 197,
     totalCopies: 7,
     availableCopies: 5,
     shelfNumber: 'EN-01',
@@ -305,6 +317,23 @@ const books = [
     availableCopies: 5,
     shelfNumber: 'AB-04',
     description: 'Zamonaviy o\'zbek romani.',
+  },
+  {
+    title: 'Yolg\'izlik',
+    author: 'Ulug\'bek Hamdam',
+    subject: 'Adabiyot',
+    books_id_key: 'yolgizlik',
+    category: 'Adabiyot',
+    grades: [9, 10, 11],
+    language: 'O\'zbek',
+    publisher: 'Sharq',
+    publishYear: 2021,
+    isbn: '978-9943-28-340-8',
+    pages: 5,
+    totalCopies: 3,
+    availableCopies: 3,
+    shelfNumber: 'AB-05',
+    description: 'Ulug\'bek Hamdam qalamiga mansub asar.',
   },
 ];
 
@@ -434,7 +463,7 @@ log('\nKitoblar...');
       isbn: b.isbn,
       pages: b.pages,
       coverImage: coverUrl(b.title, b.author, COVER_COLORS[b.books_id_key] ?? '#475569'),
-      pdfUrl: EBOOK_KEYS.includes(b.books_id_key) ? '/pdfs/placeholder.pdf' : '',
+      pdfUrl: PDF_MAP[b.books_id_key] ?? (EBOOK_KEYS.includes(b.books_id_key) ? '/pdfs/placeholder.pdf' : ''),
       books_id_key: b.books_id_key,
       totalCopies: b.totalCopies,
       availableCopies: b.availableCopies,

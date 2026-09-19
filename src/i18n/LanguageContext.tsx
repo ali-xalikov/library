@@ -1,8 +1,8 @@
-import { createContext, useContext, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
-import translations from './translations';
+import { createContext, useContext, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import translations from "./translations";
 
-type Language = 'uz' | 'en';
+type Language = "uz" | "en" | "ru";
 
 interface LanguageContextValue {
   language: Language;
@@ -10,15 +10,17 @@ interface LanguageContextValue {
   t: (key: string) => string;
 }
 
-const STORAGE_KEY = 'library-language';
+const STORAGE_KEY = "library-language";
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window === 'undefined') return 'uz';
+    if (typeof window === "undefined") return "uz";
+
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    return stored === 'en' ? 'en' : 'uz';
+
+    return stored === "en" ? "en" : stored === "ru" ? "ru" : "uz";
   });
 
   const setLanguage = (lang: Language) => {
@@ -31,10 +33,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const t = (key: string): string => {
       const dict = translations[language] as Record<string, unknown>;
       const val = dict[key];
-      if (typeof val === 'string') return val;
+
+      if (typeof val === "string") return val;
+
       const fallback = (translations.uz as Record<string, unknown>)[key];
-      return typeof fallback === 'string' ? fallback : key;
+
+      return typeof fallback === "string" ? fallback : key;
     };
+
     return { language, setLanguage, t };
   }, [language]);
 
@@ -47,8 +53,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
 export function useTranslation(): LanguageContextValue {
   const ctx = useContext(LanguageContext);
+
   if (!ctx) {
-    throw new Error('useTranslation must be used within a LanguageProvider');
+    throw new Error("useTranslation must be used within a LanguageProvider");
   }
+
   return ctx;
 }
