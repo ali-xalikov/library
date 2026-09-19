@@ -29,6 +29,9 @@ function getPageNumbers(current: number, total: number): (number | '...')[] {
   return pages;
 }
 
+const NAV_BTN =
+  'icon-btn h-9 w-9 rounded-xl text-slate-600 dark:text-slate-400';
+
 export default function Pagination({
   currentPage,
   totalPages,
@@ -39,11 +42,12 @@ export default function Pagination({
   const pages = getPageNumbers(currentPage, totalPages);
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1.5">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="inline-flex items-center justify-center rounded-lg px-2 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+        aria-label="Oldingi"
+        className={`${NAV_BTN} disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none`}
       >
         <ChevronLeft className="h-4 w-4" />
       </button>
@@ -52,7 +56,7 @@ export default function Pagination({
         page === '...' ? (
           <span
             key={`ellipsis-${i}`}
-            className="px-2 py-2 text-sm text-slate-400 dark:text-slate-500"
+            className="px-1.5 py-2 text-sm text-slate-400 dark:text-slate-500"
           >
             ...
           </span>
@@ -60,10 +64,11 @@ export default function Pagination({
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            aria-current={currentPage === page ? 'page' : undefined}
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 active:scale-90 ${
               currentPage === page
-                ? 'bg-primary-600 text-white'
-                : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
+                ? 'bg-gradient-to-b from-primary-400 to-primary-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_6px_16px_-6px_rgba(37,99,235,0.6)]'
+                : 'text-slate-600 backdrop-blur-md hover:bg-white/60 hover:text-primary-600 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-primary-300'
             }`}
           >
             {page}
@@ -74,7 +79,8 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="inline-flex items-center justify-center rounded-lg px-2 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+        aria-label="Keyingi"
+        className={`${NAV_BTN} disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none`}
       >
         <ChevronRight className="h-4 w-4" />
       </button>

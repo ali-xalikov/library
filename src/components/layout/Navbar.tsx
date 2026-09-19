@@ -61,8 +61,7 @@ const DEFAULT_USER: User = {
   createdAt: new Date().toISOString(),
 };
 
-const ICON_BUTTON_CLASS =
-  "flex h-10 w-10 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white";
+const ICON_BUTTON_CLASS = "icon-btn";
 
 function getPageTitle(pathname: string, t: (key: string) => string): string {
   if (pathname in PAGE_TITLES) return t(PAGE_TITLES[pathname]);
@@ -119,10 +118,14 @@ export default function Navbar({
   return (
     <header
       className={classNames(
-        "fixed left-0 right-0 top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b border-slate-200 px-3 sm:px-4",
-        "bg-white/80 backdrop-blur-sm dark:border-slate-700/60 dark:bg-slate-900/80"
+        "glass-float animate-slide-in-top fixed left-0 right-0 top-0 z-30 flex h-14 sm:h-16 items-center justify-between border border-white/50 px-3 sm:px-4 dark:border-white/8"
       )}
     >
+      {/* Animated light sweep under the bar */}
+      <span
+        aria-hidden
+        className="shine-line pointer-events-none absolute inset-x-6 bottom-0 h-[2px] rounded-full opacity-70 sm:inset-x-10"
+      />
       {/* Left: hamburger */}
       <div className="flex items-center gap-2">
         <button
@@ -176,9 +179,9 @@ export default function Navbar({
           <button
             type="button"
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="flex items-center gap-1.5 rounded-lg py-1 pl-1 pr-1.5 sm:pr-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="flex items-center gap-1.5 rounded-full py-1 pl-1 pr-1.5 sm:pr-2 transition-all duration-300 ease-out hover:bg-white/60 active:scale-95 dark:hover:bg-white/8 ml-1"
           >
-            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+            <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-700 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_6px_16px_-6px_rgba(37,99,235,0.7)] ring-2 ring-white/70 dark:ring-white/10">
               {getInitials(user.firstName, user.lastName)}
             </div>
             <span className="hidden max-w-[100px] truncate text-sm font-medium text-slate-700 dark:text-slate-200 md:block">
@@ -188,42 +191,40 @@ export default function Navbar({
           </button>
 
           {menuOpen && (
-            <div className="animate-fade-in absolute right-0 top-[calc(100%+8px)] w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-800">
-              <div className="border-b border-slate-100 px-4 py-3 dark:border-slate-700">
-                <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+            <div className="glass-panel animate-pop-in absolute right-0 top-[calc(100%+10px)] w-56 overflow-hidden p-1.5 shadow-[0_32px_80px_-24px_rgba(15,23,42,0.45)]">
+              <div className="relative mb-1 rounded-xl bg-white/40 px-4 py-3 dark:bg-white/5">
+                <p className="truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
                   {user.firstName} {user.lastName}
                 </p>
                 <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">
                   {t(`role.${ROLE_LABELS[user.role]}`)} · {user.email}
                 </p>
               </div>
-              <div className="p-1.5">
-                <Link
-                  to="/profile"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/60"
-                >
-                  <UserIcon className="h-4 w-4 text-slate-400" />
-                  {t("navbar.profile")}
-                </Link>
-                <Link
-                  to="/settings"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-700/60"
-                >
-                  <Settings className="h-4 w-4 text-slate-400" />
-                  {t("page.settings")}
-                </Link>
-                <div className="my-1 h-px bg-slate-100 dark:bg-slate-700" />
-                <button
-                  type="button"
-                  onClick={onLogout}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
-                >
-                  <LogOut className="h-4 w-4" />
-                  {t("navbar.logout")}
-                </button>
-              </div>
+              <Link
+                to="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-all duration-200 hover:bg-white/70 hover:text-primary-700 active:scale-[0.98] dark:text-slate-200 dark:hover:bg-white/8 dark:hover:text-primary-300"
+              >
+                <UserIcon className="h-4 w-4 text-slate-400" />
+                {t("navbar.profile")}
+              </Link>
+              <Link
+                to="/settings"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition-all duration-200 hover:bg-white/70 hover:text-primary-700 active:scale-[0.98] dark:text-slate-200 dark:hover:bg-white/8 dark:hover:text-primary-300"
+              >
+                <Settings className="h-4 w-4 text-slate-400" />
+                {t("page.settings")}
+              </Link>
+              <div className="my-1 h-px bg-slate-200/60 dark:bg-white/8" />
+              <button
+                type="button"
+                onClick={onLogout}
+                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm text-red-600 transition-all duration-200 hover:bg-red-500/10 active:scale-[0.98] dark:text-red-400 dark:hover:bg-red-500/15"
+              >
+                <LogOut className="h-4 w-4" />
+                {t("navbar.logout")}
+              </button>
             </div>
           )}
         </div>

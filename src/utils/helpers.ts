@@ -188,6 +188,21 @@ export function getDashboardStats(
   };
 }
 
+const UZ_MONTHS = [
+  'Yanvar',
+  'Fevral',
+  'Mart',
+  'Aprel',
+  'May',
+  'Iyun',
+  'Iyul',
+  'Avgust',
+  'Sentabr',
+  'Oktabr',
+  'Noyabr',
+  'Dekabr',
+];
+
 export function getMonthlyStats(borrows: BorrowRecord[]): MonthlyStats[] {
   const now = new Date();
   const months: MonthlyStats[] = [];
@@ -212,10 +227,7 @@ export function getMonthlyStats(borrows: BorrowRecord[]): MonthlyStats[] {
     }).length;
 
     months.push({
-      month: date.toLocaleDateString('uz-Latn', {
-        month: 'short',
-        year: 'numeric',
-      }),
+      month: UZ_MONTHS[month],
       issued: issuedCount,
       returned: returnedCount,
     });

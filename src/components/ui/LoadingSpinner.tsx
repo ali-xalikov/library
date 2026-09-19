@@ -12,26 +12,14 @@ const sizeStyles: Record<NonNullable<LoadingSpinnerProps['size']>, string> = {
 export default function LoadingSpinner({ size = 'md', className = '' }: LoadingSpinnerProps) {
   return (
     <div className={`inline-flex items-center justify-center ${className}`}>
-      <svg
-        className={`animate-spin text-primary-600 ${sizeStyles[size]}`}
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-      >
-        <circle
-          className="opacity-25"
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="4"
+      <span className="relative inline-flex">
+        <span
+          className={`animate-spin rounded-full border-2 border-primary-500/20 border-t-primary-500 ${sizeStyles[size]}`}
         />
-        <path
-          className="opacity-75"
-          fill="currentColor"
-          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        <span
+          className={`absolute inset-0 rounded-full border border-white/40 dark:border-white/10 ${sizeStyles[size]}`}
         />
-      </svg>
+      </span>
     </div>
   );
 }

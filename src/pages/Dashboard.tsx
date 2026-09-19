@@ -6,13 +6,18 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from "recharts";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import type { ChartConfig } from "@/components/ui/chart";
 import {
   Activity,
   AlertTriangle,
@@ -199,11 +204,11 @@ function SectionHeader({
   return (
     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
       <div>
-        <div className="flex items-center gap-2">
-          <span className="rounded-lg bg-primary-50 p-1.5 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+        <div className="flex items-center gap-2.5">
+          <span className="relative rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/10 p-2 text-primary-600 ring-1 ring-primary-500/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:text-primary-400 dark:ring-primary-400/20">
             <Icon className="h-4 w-4" />
           </span>
-          <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+          <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-white">
             {title}
           </h3>
         </div>
@@ -214,7 +219,7 @@ function SectionHeader({
       {actionLink && (
         <Link
           to={actionLink.to}
-          className="touch-sm inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/30"
+          className="touch-sm inline-flex items-center gap-1 rounded-full border border-primary-500/25 bg-primary-500/10 px-3 py-1.5 text-xs font-medium text-primary-600 backdrop-blur-md transition-all duration-300 ease-out hover:border-primary-500/50 hover:bg-primary-500/15 hover:shadow-[0_6px_16px_-6px_rgba(37,99,235,0.5)] active:scale-95 dark:text-primary-400"
         >
           {actionLink.label}
           <ArrowUpRight className="h-3.5 w-3.5" />
@@ -238,15 +243,23 @@ function StatCard({
   tint?: string;
 }) {
   return (
-    <Card className={classNames("relative overflow-hidden animate-fade-in", tint)}>
-      <div className="flex items-start justify-between">
+    <Card
+      className={classNames(
+        "group relative overflow-hidden animate-fade-in transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_1px_2px_rgba(15,23,42,0.05),0_20px_48px_-16px_rgba(37,99,235,0.35)]",
+        tint
+      )}
+    >
+      <div className="pointer-events-none absolute -right-12 -top-12 h-36 w-36 rounded-full p-5 from-primary-400/25 to-primary-600/5 blur-2xl opacity-60 transition-all duration-500 group-hover:scale-125 group-hover:opacity-100" />
+      <div className="relative z-10 flex items-start justify-between">
         <div>
-          <p className="text-3xl font-bold text-slate-900 dark:text-white">{value}</p>
+          <p className="text-3xl font-bold tracking-tight tabular-nums text-slate-900 dark:text-white transition-transform duration-300 group-hover:-translate-y-0.5">
+            {value}
+          </p>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{label}</p>
         </div>
         <span
           className={classNames(
-            "h-12 w-12 shrink-0 rounded-xl flex items-center justify-center",
+            "h-12 w-12 shrink-0 rounded-2xl flex items-center justify-center shadow-[inset_0_1px_0_rgba(255,255,255,0.6),0_8px_20px_-8px_rgba(15,23,42,0.25)] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3",
             iconClass
           )}
         >
@@ -274,18 +287,18 @@ function QuickAction({
     <button
       type="button"
       onClick={onClick}
-      className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-primary-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-primary-700"
+      className="group flex items-center gap-3 rounded-2xl border border-white/60 bg-white/50 p-1 text-left backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_8px_24px_-12px_rgba(15,23,42,0.18)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary-400/60 hover:bg-white/70 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_16px_36px_-14px_rgba(37,99,235,0.4)] active:scale-[0.98] dark:border-white/8 dark:bg-slate-800/50 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_-12px_rgba(0,0,0,0.5)] dark:hover:border-primary-400/40 dark:hover:bg-slate-700/50"
     >
       <span
         className={classNames(
-          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110",
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-6",
           iconClass
         )}
       >
         <Icon className="h-5 w-5" />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-sm font-semibold text-slate-900 dark:text-white">
+        <span className="block truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
           {label}
         </span>
         {sub && (
@@ -293,6 +306,9 @@ function QuickAction({
             {sub}
           </span>
         )}
+      </span>
+      <span className="ml-auto hidden h-6 w-6 items-center justify-center rounded-full bg-white/60 text-slate-400 opacity-0 shadow-sm transition-all duration-300 group-hover:opacity-100 dark:bg-white/10 dark:text-slate-300 sm:flex">
+        <ArrowUpRight className="h-3.5 w-3.5" />
       </span>
     </button>
   );
@@ -316,6 +332,8 @@ function MiniBookThumb({
       <img
         src={book.coverImage}
         alt={book.title}
+        loading="lazy"
+        decoding="async"
         onError={() => setImgError(true)}
         className={classNames("shrink-0 object-cover", dims)}
       />
@@ -959,6 +977,29 @@ export default function Dashboard() {
   const subjectData = getSubjectStats(books);
   const gradeData = getGradeStats(borrows, users);
 
+  const monthlyChartConfig: ChartConfig = {
+    issued: { label: t("dashboard.issued"), color: "#3b82f6" },
+    returned: { label: t("dashboard.returned"), color: "#10b981" },
+  };
+
+  const countChartConfig: ChartConfig = {
+    count: { label: t("dashboard.issued"), color: "#8b5cf6" },
+  };
+
+  const gradeChartConfig: ChartConfig = {
+    count: { label: t("dashboard.issued"), color: "#f59e0b" },
+  };
+
+  const subjectChartConfig: ChartConfig = Object.fromEntries(
+    subjectData.map((entry, index) => [
+      entry.subject,
+      {
+        label: entry.subject,
+        color: CHART_COLORS[index % CHART_COLORS.length],
+      },
+    ])
+  );
+
   const stats: DashboardStats = {
     totalBooks: totalCopies,
     availableBooks: availableCopies,
@@ -979,11 +1020,11 @@ export default function Dashboard() {
   }
 
   const renderHostHeader = () => (
-    <div className="animate-fade-in">
+    <div className="relative z-30 animate-fade-in">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
-            {t("dashboard.welcome")} {firstName} {lastName}!
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl dark:text-white">
+            {t("dashboard.welcome")} <span className="bg-gradient-to-r from-primary-600 to-violet-600 bg-clip-text text-transparent dark:from-primary-400 dark:to-violet-400">{firstName} {lastName}!</span>
           </h1>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -1024,7 +1065,7 @@ export default function Dashboard() {
               aria-label={t("dashboard.searchLabel")}
             />
             {(hasSearchResults || showNoResults) && (
-              <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-96 overflow-y-auto rounded-xl border border-slate-200 bg-white p-2 shadow-xl animate-slide-in dark:border-slate-700 dark:bg-slate-800">
+              <div className="glass-panel absolute left-0 right-0 top-full z-30 mt-2 max-h-96 overflow-y-auto p-2 shadow-[0_32px_80px_-24px_rgba(15,23,42,0.45)] animate-pop-in">
                 {bookResults.length > 0 && (
                   <>
                     <p className="px-3 pb-1 pt-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -1415,41 +1456,50 @@ export default function Dashboard() {
           <div className="grid gap-6 lg:grid-cols-2">
             <Card className="animate-fade-in">
               <SectionHeader icon={TrendingUp} title={t("dashboard.monthlyActivity")} />
-              <ResponsiveContainer width="100%" height={280}>
+              <ChartContainer config={monthlyChartConfig} className="h-[280px] w-full">
                 <BarChart data={monthlyData} barGap={4}>
+                  <defs>
+                    <linearGradient id="dashMonthlyIssued" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.2} />
+                    </linearGradient>
+                    <linearGradient id="dashMonthlyReturned" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#10b981" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity={0.2} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="#cbd5e1"
                     strokeOpacity={0.5}
                   />
-                  <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#64748b" }} />
-                  <YAxis
-                    allowDecimals={false}
+                  <XAxis
+                    dataKey="month"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
                     tick={{ fontSize: 12, fill: "#64748b" }}
                   />
-                  <Tooltip
-                    cursor={{ fill: "rgba(148, 163, 184, 0.15)" }}
-                    contentStyle={{
-                      borderRadius: 8,
-                      border: "1px solid #e2e8f0",
-                      fontSize: 12,
-                    }}
+                  <YAxis
+                    allowDecimals={false}
+                    tickLine={false}
+                    axisLine={false}
+                    tick={{ fontSize: 12, fill: "#64748b" }}
                   />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <ChartLegend content={<ChartLegendContent />} />
                   <Bar
                     dataKey="issued"
-                    name={t("dashboard.issued")}
-                    fill="#3b82f6"
+                    fill="url(#dashMonthlyIssued)"
                     radius={[4, 4, 0, 0]}
                   />
                   <Bar
                     dataKey="returned"
-                    name={t("dashboard.returned")}
-                    fill="#10b981"
+                    fill="url(#dashMonthlyReturned)"
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </Card>
 
             <Card className="animate-fade-in">
@@ -1461,12 +1511,18 @@ export default function Dashboard() {
                   description={t("dashboard.noActivityDesc")}
                 />
               ) : (
-                <ResponsiveContainer width="100%" height={280}>
+                <ChartContainer config={countChartConfig} className="h-[280px] w-full">
                   <BarChart
                     data={topBooks}
                     layout="vertical"
                     margin={{ left: 8, right: 16 }}
                   >
+                    <defs>
+                      <linearGradient id="dashTopBooks" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.95} />
+                        <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="#cbd5e1"
@@ -1475,30 +1531,26 @@ export default function Dashboard() {
                     <XAxis
                       type="number"
                       allowDecimals={false}
+                      tickLine={false}
+                      axisLine={false}
                       tick={{ fontSize: 12, fill: "#64748b" }}
                     />
                     <YAxis
                       type="category"
                       dataKey="title"
                       width={150}
+                      tickLine={false}
+                      axisLine={false}
                       tick={{ fontSize: 11, fill: "#64748b" }}
                     />
-                    <Tooltip
-                      cursor={{ fill: "rgba(148, 163, 184, 0.15)" }}
-                      contentStyle={{
-                        borderRadius: 8,
-                        border: "1px solid #e2e8f0",
-                        fontSize: 12,
-                      }}
-                    />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                     <Bar
                       dataKey="count"
-                      name={t("dashboard.issued")}
-                      fill="#8b5cf6"
+                      fill="url(#dashTopBooks)"
                       radius={[0, 4, 4, 0]}
                     />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               )}
             </Card>
           </div>
@@ -1513,8 +1565,24 @@ export default function Dashboard() {
                   description={t("dashboard.noBooksDesc")}
                 />
               ) : (
-                <ResponsiveContainer width="100%" height={280}>
+                <ChartContainer config={subjectChartConfig} className="h-[280px] w-full">
                   <PieChart>
+                    <defs>
+                      {CHART_COLORS.map((color, index) => (
+                        <linearGradient
+                          key={`dashPieGrad${index}`}
+                          id={`dashPie${index}`}
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop offset="0%" stopColor={color} stopOpacity={0.95} />
+                          <stop offset="100%" stopColor={color} stopOpacity={0.3} />
+                        </linearGradient>
+                      ))}
+                    </defs>
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                     <Pie
                       data={subjectData}
                       dataKey="count"
@@ -1527,20 +1595,13 @@ export default function Dashboard() {
                       {subjectData.map((entry, index) => (
                         <Cell
                           key={entry.subject}
-                          fill={CHART_COLORS[index % CHART_COLORS.length]}
+                          fill={`url(#dashPie${index % CHART_COLORS.length})`}
                         />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: 8,
-                        border: "1px solid #e2e8f0",
-                        fontSize: 12,
-                      }}
-                    />
-                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                    <ChartLegend content={<ChartLegendContent nameKey="subject" />} />
                   </PieChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               )}
             </Card>
 
@@ -1553,34 +1614,40 @@ export default function Dashboard() {
                   description={t("dashboard.noDataDesc")}
                 />
               ) : (
-                <ResponsiveContainer width="100%" height={280}>
+                <ChartContainer config={gradeChartConfig} className="h-[280px] w-full">
                   <BarChart data={gradeData} barGap={4}>
+                    <defs>
+                      <linearGradient id="dashGrade" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.95} />
+                        <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.2} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       stroke="#cbd5e1"
                       strokeOpacity={0.5}
                     />
-                    <XAxis dataKey="grade" tick={{ fontSize: 12, fill: "#64748b" }} />
-                    <YAxis
-                      allowDecimals={false}
+                    <XAxis
+                      dataKey="grade"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
                       tick={{ fontSize: 12, fill: "#64748b" }}
                     />
-                    <Tooltip
-                      cursor={{ fill: "rgba(148, 163, 184, 0.15)" }}
-                      contentStyle={{
-                        borderRadius: 8,
-                        border: "1px solid #e2e8f0",
-                        fontSize: 12,
-                      }}
+                    <YAxis
+                      allowDecimals={false}
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fontSize: 12, fill: "#64748b" }}
                     />
+                    <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                     <Bar
                       dataKey="count"
-                      name={t("dashboard.issued")}
-                      fill="#f59e0b"
+                      fill="url(#dashGrade)"
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>
-                </ResponsiveContainer>
+                </ChartContainer>
               )}
             </Card>
           </div>

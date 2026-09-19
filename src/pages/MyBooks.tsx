@@ -99,6 +99,8 @@ export default function MyBooks() {
                       <img
                         src={book.coverImage}
                         alt={book.title}
+                        loading="lazy"
+                        decoding="async"
                         className="h-28 w-20 shrink-0 rounded-lg object-cover"
                       />
                     ) : (

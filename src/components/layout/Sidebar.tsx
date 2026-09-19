@@ -112,7 +112,7 @@ export default function Sidebar({
     <aside
       className={classNames(
         // Base
-        'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-slate-200 bg-white shadow-sm transition-all duration-300 dark:border-slate-700/60 dark:bg-slate-900',
+        'glass-float animate-sidebar-in fixed inset-y-0 left-0 z-40 flex flex-col border border-white/50 dark:border-white/8 transition-all duration-300 ease-out',
         // Desktop width
         'lg:translate-x-0',
         collapsed ? 'lg:w-[72px]' : 'lg:w-[260px]',
@@ -122,23 +122,30 @@ export default function Sidebar({
       )}
     >
       {/* Header */}
-      <div className="flex h-16 shrink-0 items-center border-b border-slate-200 px-4 dark:border-slate-700/60">
+      <div className="relative flex h-16 shrink-0 items-center border-b border-white/55 px-4 dark:border-white/8">
         {/* Mobile close button */}
         <button
           type="button"
           onClick={onMobileClose}
-          className="mr-2 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 lg:hidden"
+          className="icon-btn mr-2 h-8 w-8 lg:hidden"
           aria-label={t('navbar.menyu')}
         >
           <X className="h-4 w-4" />
         </button>
 
-        <BookOpen className="h-8 w-8 shrink-0 text-primary-600 dark:text-primary-400" />
+        <div
+          className={classNames(
+            'relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-primary-400 to-primary-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_6px_16px_-6px_rgba(37,99,235,0.7)] transition-all duration-300',
+            collapsed ? 'lg:w-0 lg:min-w-0 lg:scale-75 lg:opacity-0' : ''
+          )}
+        >
+          <BookOpen className="h-5 w-5 text-white" />
+        </div>
 
         <span
           className={classNames(
-            'ml-3 truncate text-base font-bold text-slate-900 dark:text-white transition-all duration-300',
-            collapsed ? 'lg:hidden' : ''
+            'ml-3 truncate text-base font-bold tracking-tight text-slate-900 dark:text-white transition-all duration-300',
+            collapsed ? 'lg:ml-0 lg:w-0 lg:min-w-0 lg:overflow-hidden lg:opacity-0' : ''
           )}
         >
           {t('app.name')}
@@ -151,11 +158,15 @@ export default function Sidebar({
           title={t('navbar.yigish')}
           aria-label={t('navbar.yigish')}
           className={classNames(
-            'ml-auto hidden lg:flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:text-slate-200',
-            collapsed ? 'rotate-180' : ''
+            'icon-btn ml-auto hidden h-8 w-8 lg:flex!'
           )}
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft
+            className={classNames(
+              'h-4 w-4 transition-transform duration-300 ease-out',
+              collapsed ? 'rotate-180' : ''
+            )}
+          />
         </button>
       </div>
 
@@ -178,7 +189,12 @@ export default function Sidebar({
               }
             >
               <Icon className="h-5 w-5 shrink-0" />
-              <span className={classNames('truncate', collapsed && 'lg:hidden')}>
+              <span
+                className={classNames(
+                  'truncate transition-all duration-300',
+                  collapsed && 'lg:w-0 lg:min-w-0 lg:opacity-0'
+                )}
+              >
                 {t(item.labelKey)}
               </span>
             </NavLink>
@@ -187,16 +203,21 @@ export default function Sidebar({
       </nav>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-slate-200 p-3 dark:border-slate-700/60">
+      <div className="shrink-0 border-t border-white/55 p-3 dark:border-white/8">
         <div className={classNames('flex items-center gap-3', collapsed && 'lg:flex-col')}>
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-600 text-sm font-semibold text-white">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary-400 to-primary-700 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_6px_16px_-6px_rgba(37,99,235,0.7)] ring-2 ring-white/70 dark:ring-white/10">
             {getInitials(user.firstName, user.lastName)}
           </div>
-          <div className={classNames('min-w-0 flex-1', collapsed && 'lg:hidden')}>
-            <p className="truncate text-sm font-medium text-slate-900 dark:text-white">
+          <div
+            className={classNames(
+              'min-w-0 flex-1 transition-all duration-300',
+              collapsed ? 'lg:w-0 lg:flex-none lg:overflow-hidden lg:opacity-0' : ''
+            )}
+          >
+            <p className="truncate text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
               {user.firstName} {user.lastName}
             </p>
-            <span className="mt-0.5 inline-block rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-700 dark:bg-primary-900/30 dark:text-primary-400">
+            <span className="mt-0.5 inline-block rounded-full bg-primary-500/15 px-2 py-0.5 text-[11px] font-medium text-primary-700 ring-1 ring-primary-500/25 dark:bg-primary-400/10 dark:text-primary-300 dark:ring-primary-400/25">
               {t(`role.${ROLE_LABELS[role]}`)}
             </span>
           </div>
@@ -205,7 +226,7 @@ export default function Sidebar({
             onClick={onLogout}
             title={t('navbar.logout')}
             aria-label={t('navbar.logout')}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-500/10 dark:hover:text-red-400"
+            className="icon-btn h-9 w-9 text-slate-400 hover:text-red-600 dark:text-slate-500 dark:hover:text-red-400"
           >
             <LogOut className="h-5 w-5" />
           </button>

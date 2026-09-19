@@ -230,6 +230,8 @@ function OnlineReaderContent({ bookId }: { bookId?: string }) {
             <img
               src={book.coverImage}
               alt={book.title}
+              loading="lazy"
+              decoding="async"
               className="h-40 w-28 shrink-0 rounded-lg object-cover"
             />
           ) : (

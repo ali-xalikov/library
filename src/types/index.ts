@@ -18,6 +18,7 @@ export interface User {
   role: Role;
   avatar?: string;
   grade?: Grade;
+  className?: string;
   qrCode?: string;
   phone?: string;
   createdAt: string;
@@ -52,6 +53,7 @@ export interface BorrowRecord {
   bookTitle: string;
   studentId: string;
   studentName: string;
+  className?: string;
   issuedBy: string;
   issuedDate: string;
   dueDate: string;

@@ -5,15 +5,20 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   LineChart,
   Line,
-  Legend,
 } from 'recharts';
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
+import type { ChartConfig } from '@/components/ui/chart';
 import {
   BookOpen,
   Users,
@@ -55,13 +60,6 @@ const CHART_COLORS = [
   '#0ea5e9',
 ];
 
-const tooltipStyle: Record<string, string | number> = {
-  borderRadius: 8,
-  border: '1px solid #e2e8f0',
-  fontSize: 12,
-  backgroundColor: '#ffffff',
-};
-
 function SectionHeader({
   icon: Icon,
   title,
@@ -73,11 +71,11 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-4 flex items-center justify-between gap-2">
-      <div className="flex items-center gap-2">
-        <span className="rounded-lg bg-primary-50 p-1.5 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400">
+      <div className="flex items-center gap-2.5">
+        <span className="relative rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/10 p-2 text-primary-600 ring-1 ring-primary-500/25 shadow-[inset_0_1px_0_rgba(255,255,255,0.5)] dark:text-primary-400 dark:ring-primary-400/20">
           <Icon className="h-4 w-4" />
         </span>
-        <h3 className="text-base font-semibold text-slate-900 dark:text-white">{title}</h3>
+        <h3 className="text-base font-semibold tracking-tight text-slate-900 dark:text-white">{title}</h3>
       </div>
       {onExport && (
         <Button variant="outline" size="sm" onClick={onExport}>
@@ -102,6 +100,29 @@ export default function Reports() {
   const activeStudents = getActiveStudents(borrows, 10);
   const subjectData = getSubjectStats(books);
   const monthlyData = getMonthlyStats(borrows);
+
+  const topBooksChartConfig: ChartConfig = {
+    count: { label: 'Berilgan', color: '#3b82f6' },
+  };
+
+  const studentsChartConfig: ChartConfig = {
+    count: { label: 'Kitoblar', color: '#8b5cf6' },
+  };
+
+  const subjectChartConfig: ChartConfig = Object.fromEntries(
+    subjectData.map((entry, index) => [
+      entry.subject,
+      {
+        label: entry.subject,
+        color: CHART_COLORS[index % CHART_COLORS.length],
+      },
+    ])
+  );
+
+  const monthlyChartConfig: ChartConfig = {
+    issued: { label: 'Berilgan', color: '#3b82f6' },
+    returned: { label: 'Qaytarilgan', color: '#10b981' },
+  };
 
   const overdueBorrows = borrows
     .filter(
@@ -144,15 +165,21 @@ export default function Reports() {
             />
           ) : (
             <>
-              <ResponsiveContainer width="100%" height={250}>
+              <ChartContainer config={topBooksChartConfig} className="h-[250px] w-full">
                 <BarChart data={topBooks} layout="vertical" margin={{ left: 8, right: 16 }}>
+                  <defs>
+                    <linearGradient id="reportTopBooks" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.2} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" strokeOpacity={0.5} />
-                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                  <YAxis type="category" dataKey="title" width={150} tick={{ fontSize: 11, fill: '#64748b' }} />
-                  <Tooltip cursor={{ fill: 'rgba(148, 163, 184, 0.15)' }} contentStyle={tooltipStyle} />
-                  <Bar dataKey="count" name="Berilgan" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                  <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <YAxis type="category" dataKey="title" width={150} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <Bar dataKey="count" fill="url(#reportTopBooks)" radius={[0, 4, 4, 0]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
               <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
                 <table className="w-full text-sm">
                   <thead>
@@ -201,15 +228,21 @@ export default function Reports() {
             />
           ) : (
             <>
-              <ResponsiveContainer width="100%" height={250}>
+              <ChartContainer config={studentsChartConfig} className="h-[250px] w-full">
                 <BarChart data={activeStudents} layout="vertical" margin={{ left: 8, right: 16 }}>
+                  <defs>
+                    <linearGradient id="reportStudents" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.95} />
+                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.2} />
+                    </linearGradient>
+                  </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" strokeOpacity={0.5} />
-                  <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                  <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 11, fill: '#64748b' }} />
-                  <Tooltip cursor={{ fill: 'rgba(148, 163, 184, 0.15)' }} contentStyle={tooltipStyle} />
-                  <Bar dataKey="count" name="Kitoblar" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                  <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                  <YAxis type="category" dataKey="name" width={140} tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#64748b' }} />
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <Bar dataKey="count" fill="url(#reportStudents)" radius={[0, 4, 4, 0]} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
               <div className="mt-4 overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700">
                 <table className="w-full text-sm">
                   <thead>
@@ -257,8 +290,24 @@ export default function Reports() {
               description="Kutubxona fondida kitoblar mavjud emas."
             />
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ChartContainer config={subjectChartConfig} className="h-[300px] w-full">
               <PieChart>
+                <defs>
+                  {CHART_COLORS.map((color, index) => (
+                    <linearGradient
+                      key={`reportPieGrad${index}`}
+                      id={`reportPie${index}`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor={color} stopOpacity={0.95} />
+                      <stop offset="100%" stopColor={color} stopOpacity={0.3} />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                 <Pie
                   data={subjectData}
                   dataKey="count"
@@ -269,13 +318,12 @@ export default function Reports() {
                   labelLine={false}
                 >
                   {subjectData.map((entry, index) => (
-                    <Cell key={entry.subject} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                    <Cell key={entry.subject} fill={`url(#reportPie${index % CHART_COLORS.length})`} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={tooltipStyle} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
+                <ChartLegend content={<ChartLegendContent nameKey="subject" />} />
               </PieChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           )}
         </Card>
 
@@ -301,17 +349,27 @@ export default function Reports() {
               description="Hozircha oylik statistika mavjud emas."
             />
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ChartContainer config={monthlyChartConfig} className="h-[300px] w-full">
               <LineChart data={monthlyData}>
+                <defs>
+                  <linearGradient id="reportLineIssued" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="reportLineReturned" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10b981" stopOpacity={1} />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" strokeOpacity={0.5} />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#64748b' }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Line type="monotone" dataKey="issued" name="Berilgan" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="returned" name="Qaytarilgan" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12, fill: '#64748b' }} />
+                <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                <ChartLegend content={<ChartLegendContent />} />
+                <Line type="monotone" dataKey="issued" stroke="url(#reportLineIssued)" strokeWidth={2} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="returned" stroke="url(#reportLineReturned)" strokeWidth={2} dot={{ r: 4 }} />
               </LineChart>
-            </ResponsiveContainer>
+            </ChartContainer>
           )}
         </Card>
 

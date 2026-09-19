@@ -143,16 +143,16 @@ export default function Register() {
   };
 
   const inputBase =
-    'w-full rounded-lg border bg-white py-2.5 pl-11 pr-10 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500';
-  const inputNormal = `${inputBase} border-slate-300 focus:border-primary-500 focus:ring-primary-500/20 dark:border-slate-600 dark:focus:border-primary-400 dark:focus:ring-primary-400/20`;
-  const inputError = `${inputBase} border-red-400 focus:border-red-500 focus:ring-red-500/20 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500/20`;
+    'field pl-11 pr-10 py-2.5 text-sm text-slate-900 placeholder-slate-400 dark:text-white dark:placeholder-slate-500';
+  const inputNormal = inputBase;
+  const inputError = `${inputBase} border-red-400 dark:border-red-500 shadow-[0_0_0_3.5px_rgba(239,68,68,0.12)]`;
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950">
       {/* Mobil sarlavha */}
-      <div className="lg:hidden fixed top-0 inset-x-0 z-10 bg-gradient-to-r from-slate-800 to-primary-800 px-6 py-4 flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
-          <BookOpen className="h-5 w-5 text-primary-300" />
+      <div className="lg:hidden fixed top-0 inset-x-0 z-10 px-6 py-4 flex items-center gap-3 bg-slate-900/60 bg-gradient-to-r from-slate-900/80 to-primary-900/70 backdrop-blur-xl">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
+          <BookOpen className="h-5 w-5 text-white" />
         </div>
         <div>
           <p className="text-sm font-bold text-white">Qarshi shahar 23-maktab</p>
@@ -191,14 +191,18 @@ export default function Register() {
 
       {/* Forma */}
       <div className="flex-1 flex items-center justify-center px-6 py-24 lg:py-12">
-        <div className="w-full max-w-md animate-fade-in">
-          <div className="lg:hidden mb-8 text-center">
-            <div className="mx-auto mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-600 to-primary-800">
-              <BookOpen className="h-7 w-7 text-white" />
+        <div className="w-full max-w-md animate-rise">
+        <div className="glass-panel relative overflow-hidden rounded-3xl p-6 sm:p-8 shadow-[0_40px_90px_-30px_rgba(37,99,235,0.4)]">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" />
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary-400/20 blur-3xl" />
+
+          <div className="lg:hidden mb-6 text-center">
+            <div className="mx-auto mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary-400 to-primary-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_10px_24px_-8px_rgba(37,99,235,0.7)]">
+              <BookOpen className="h-6 w-6 text-white" />
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white mb-1">
             {t('register.title')}
           </h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">
@@ -360,6 +364,7 @@ export default function Register() {
               {t('register.login')}
             </Link>
           </p>
+        </div>
         </div>
       </div>
     </div>

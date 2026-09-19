@@ -8,20 +8,29 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "server": "node --env-file-if-exists=.env server.js",
+    "start": "node --env-file-if-exists=.env server.js",
+    "seed:db": "node --env-file-if-exists=.env server/seed.js --force",
+    "seed:db:check": "node --env-file-if-exists=.env server/seed.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
     "@types/qrcode.react": "^1.0.5",
     "axios": "^1.20.0",
     "cheerio": "^1.2.0",
+    "clsx": "^2.1.1",
+    "cn": "^0.3.0",
     "express": "^5.2.1",
     "lucide-react": "^1.46.0",
+    "mongodb": "^7.6.0",
+    "multer": "^2.4.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3",
-    "recharts": "^3.10.1",
+    "recharts": "^3.8.0",
+    "tailwind-merge": "^3.7.0",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {

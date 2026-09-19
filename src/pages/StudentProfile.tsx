@@ -364,7 +364,7 @@ export default function StudentProfile() {
         {t('action.back')}
       </Button>
 
-      <Card className="p-6">
+      <Card className="!p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
           <div className="flex items-center gap-5">
             {student.avatar ? (
@@ -462,7 +462,7 @@ export default function StudentProfile() {
             </button>
           ))}
         </div>
-        <Card className="p-0">{tabContent}</Card>
+        <Card className="p-0!">{tabContent}</Card>
       </div>
 
       <Modal

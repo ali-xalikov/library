@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 import type {
   User,
   Book,
+  Grade,
   BorrowRecord,
   Reservation,
   Category,
@@ -98,7 +99,8 @@ interface AppContextValue {
     book: Book,
     student: User,
     issuedBy: string,
-    copyAlreadyHeld?: boolean
+    copyAlreadyHeld?: boolean,
+    className?: string
   ) => Promise<{ success: boolean; message: string }>;
   returnBook: (borrowId: string) => Promise<void>;
   addStudent: (data: Omit<User, "id" | "createdAt">) => Promise<User>;
@@ -367,7 +369,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     book: Book,
     student: User,
     issuedBy: string,
-    copyAlreadyHeld = false
+    copyAlreadyHeld = false,
+    className = ""
   ) => {
     // Serverdagi eng so'nggi holatini o'qib olamiz — state eskirgan bo'lsa
     // ham nusxa soniga noto'g'ri qiymat yozilmaydi.
@@ -419,6 +422,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         bookTitle: currentBook.title,
         studentId: student.id,
         studentName: `${student.firstName} ${student.lastName}`,
+        ...(className ? { className } : {}),
         issuedBy,
         issuedDate: issuedDate.toISOString(),
         dueDate: dueDate.toISOString(),
@@ -426,6 +430,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
       });
 
       setBorrows((prev) => [normalizeBorrow(record), ...prev]);
+
+      if (className && className !== student.className) {
+        try {
+          const gradeMatch = className.match(/^(\d{1,2})-/);
+          const updatedStudent = await updateProfile(student.id, {
+            className,
+            ...(gradeMatch ? { grade: Number(gradeMatch[1]) as Grade } : {}),
+          });
+          setUsers((prev) =>
+            prev.map((u) =>
+              u.id === student.id ? { ...u, ...updatedStudent } : u
+            )
+          );
+        } catch {
+          /* sinfni profilda saqlashdagi xato asosiy jarayonni buzmaydi */
+        }
+      }
 
       // ... notify qismi o‘zgarishsiz
 

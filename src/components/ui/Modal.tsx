@@ -53,25 +53,29 @@ export default function Modal({
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="animate-fade-in fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-slate-900/30 backdrop-blur-xl"
     >
       <div
-        className={`relative w-full ${sizeStyles[size]} bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 animate-fade-in max-h-[90dvh] flex flex-col`}
+        className={`animate-pop-in relative w-full ${sizeStyles[size]} glass-panel rounded-t-3xl sm:rounded-2xl shadow-[0_32px_80px_-24px_rgba(15,23,42,0.45)] max-h-[90dvh] flex flex-col overflow-hidden`}
       >
+        {/* Top light edge */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent" />
+
         {/* Drag handle visible on mobile */}
         <div className="flex justify-center pt-3 sm:hidden">
-          <div className="h-1 w-10 rounded-full bg-slate-300 dark:bg-slate-600" />
+          <div className="h-1 w-10 rounded-full bg-slate-300/80 dark:bg-slate-600" />
         </div>
 
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-white/10 shrink-0">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">
             {title}
           </h2>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-300 dark:hover:bg-slate-700 transition-colors"
+            aria-label="Yopish"
+            className="icon-btn h-8 w-8 rounded-lg"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
         <div className="px-5 py-4 overflow-y-auto">{children}</div>

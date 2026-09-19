@@ -23,9 +23,6 @@ const OnlineReader = lazy(() =>
     default: m.OnlineReader,
   }))
 );
-const Register = lazy(() => {
-  return import("../pages/Register");
-});
 const Overdue = lazy(() => import("../pages/Overdue"));
 const Profile = lazy(() => import("../pages/Profile"));
 const Reports = lazy(() => import("../pages/Reports"));

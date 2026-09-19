@@ -11,10 +11,10 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
 
   const buttonClass = (active: boolean) =>
     classNames(
-      'rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors',
+      'rounded-lg px-2.5 py-1.5 text-sm font-medium transition-all duration-200 active:scale-95',
       active
-        ? 'bg-primary-600 text-white'
-        : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+        ? 'bg-gradient-to-b from-primary-400 to-primary-600 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_4px_12px_-4px_rgba(37,99,235,0.6)]'
+        : 'text-slate-600 hover:bg-white/60 hover:text-primary-700 dark:text-slate-300 dark:hover:bg-white/8 dark:hover:text-primary-300'
     );
 
   if (compact) {
@@ -26,7 +26,7 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
         onClick={() => setLanguage(next)}
         title={t('navbar.language')}
         aria-label={t('navbar.language')}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+        className="icon-btn h-10 w-10"
       >
         <Languages className="h-5 w-5" />
         <span className="sr-only">{next.toUpperCase()}</span>
@@ -38,7 +38,7 @@ export default function LanguageSwitcher({ compact = false }: LanguageSwitcherPr
   }
 
   return (
-    <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1 dark:bg-slate-700/60">
+    <div className="flex items-center gap-1 rounded-xl bg-white/50 p-1 ring-1 ring-white/60 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_4px_14px_-8px_rgba(15,23,42,0.15)] dark:bg-slate-800/50 dark:ring-white/8">
       <button
         type="button"
         onClick={() => setLanguage('uz')}

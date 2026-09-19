@@ -50,6 +50,8 @@ export default function BookCover({
         <img
           src={coverImage}
           alt={title}
+          loading="lazy"
+          decoding="async"
           onError={() => setImgError(true)}
           className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
         />

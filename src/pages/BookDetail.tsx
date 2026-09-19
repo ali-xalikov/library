@@ -103,17 +103,17 @@ export default function BookDetail() {
   const details: { label: string; value: string }[] = [
     { label: t('bookDetail.subject'), value: `${getSubjectIcon(book.subject)} ${book.subject}` },
     { label: t('bookDetail.grade'), value: book.grade.join(', ') },
-    { label: t('bookDetail.language'), value: book.language },
+    { label: t('bookDetail.lang'), value: book.language },
     { label: t('bookDetail.publisher'), value: book.publisher },
-    { label: t('bookDetail.publishYear'), value: String(book.publishYear) },
+    { label: t('bookDetail.year'), value: String(book.publishYear) },
     { label: t('bookDetail.isbn'), value: book.isbn },
     { label: t('bookDetail.pages'), value: String(book.pages) },
     {
-      label: t('bookDetail.availableCopies'),
+      label: t('bookDetail.copies'),
       value: `${book.availableCopies} / ${book.totalCopies}`,
     },
     { label: t('bookDetail.shelf'), value: book.shelfNumber },
-    { label: t('bookDetail.inventoryNumber'), value: book.inventoryNumber },
+    { label: t('bookDetail.inventory'), value: book.inventoryNumber },
   ];
 
   const canReserve = settings.allowReservation;
